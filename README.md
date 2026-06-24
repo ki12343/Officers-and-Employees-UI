@@ -1,71 +1,70 @@
 # Executive, Workforce & Compensation Disclosure UI
 
-KR DART 사업·분기보고서의 **임원·직원 및 보상 현황** 데이터와 US SEC **DEF 14A** 보상 데이터를
-하나의 공통 UI로 확인하기 위한 **임시 배포본**입니다. (핸드오프 문서 탭 포함)
+KR DART 사업·분기보고서의 **임원·직원 및 보상 현황**과 US SEC **DEF 14A** 임원·이사·보상 데이터를
+**하나의 공통 UI/스키마**로 보여 주는 정적 산출물입니다. (앱 내 「핸드오프 문서」 탭 포함)
 
-> 이번 배포본은 **KR DART 보상 데이터 + US SEC DEF 14A 보상 데이터를 함께 포함한 임시 배포본**입니다.
-> US 화면은 데모가 아니라 SEC XBRL Pay-vs-Performance 표준 태그에서 추출한 **실측 데이터(10개사)**를 반영합니다.
+- KR/US가 다른 서비스처럼 보이지 않도록 동일 섹션 구조·동일 컴포넌트·동일 라벨을 사용합니다.
+- 원문에 있는 데이터는 실제 값으로 채우고, 원문에 없는 값은 생성하지 않습니다.
+- 사용자 화면에는 내부 작업 문구를 노출하지 않습니다(미해결 데이터 범위 이슈는 본 문서에만 기록).
 
-## 실행 방법
+## 실행 / 배포 (다중 파일 — 폴더 전체 배포)
 
-브라우저에서 `index.html`을 직접 열거나, GitHub/Vercel/Netlify에 업로드해 확인할 수 있습니다.
-별도 빌드·설치 과정이 없는 단일 자립형 HTML입니다.
+`release/` **폴더 전체**를 업로드해야 합니다. `index.html` 단독 배포 또는 단일 인라인 HTML로 되돌리지 마세요.
 
-## 배포 방법
+```text
+release/
+  index.html          ← 진입 HTML
+  support.js          ← DC 런타임
+  kr-ext-data.js      ← KR 원문 추출 11개사 데이터 (window.KR_EXT)
+  kr-officers-data.js ← KR 임원현황 원문 표 (현대차/차바이오텍/삼천당, window.KR_OFFICERS)
+  us-sct-data.js      ← US Summary Compensation Table 13개사 (window.US_SCT)
+  README.md
+  HANDOFF.md
+```
 
-### GitHub Pages
-1. 이 폴더의 파일을 GitHub 저장소에 업로드합니다.
-2. Settings > Pages에서 branch를 선택합니다.
-3. `/root` 또는 `/docs` 경로를 선택해 배포합니다.
+- **GitHub Pages**: 폴더 업로드 후 Settings > Pages에서 branch/경로 지정.
+- **Vercel / Netlify**: `release/` 폴더 업로드, Framework=Static/Other, Build Command 비움, Output=`.`.
+- 스크립트 로드 순서는 `support.js` → `kr-ext-data.js` → `kr-officers-data.js` → `us-sct-data.js`이며 `index.html` `<head>`에 포함되어 있습니다.
 
-### Vercel
-1. `release/` 폴더를 프로젝트 루트로 업로드합니다.
-2. Framework Preset은 `Other` 또는 `Static`으로 설정합니다.
-3. Build Command는 비워둡니다.
-4. Output Directory도 비워두거나 `.` 로 설정합니다.
-
-### Netlify
-1. `release/` 폴더를 드래그&드롭으로 업로드합니다.
-2. Build Command / Publish Directory를 비워두거나 `.` 로 둡니다.
+> ⚠ **단일 인라인 HTML 금지**: 모든 데이터를 하나의 HTML에 인라인하면 ~22MB로 비대해져 런타임 스트리밍 렌더가 끝까지 해소되지 못하고, 원문 표 모달·일부 바인딩이 빈 상태로 남을 수 있습니다. 반드시 위 7개 파일을 함께 배포하세요.
 
 ## 포함 데이터
 
-**KR — DART 사업·분기보고서 (총 21개사)**
-- *기존 샘플 (10개사)*: 에스앤디 · 한텍 · 프리시젼바이오 · 비보존제약 · 수성웹툰 · 코스모화학 · 삼천당제약 · 신한알파리츠 · 현대자동차 · 차바이오텍.
-- *원문 PDF 추출 (11개사, 2025 사업연도)*: 동성제약 · 디와이디 · 세토피아 · 쌍방울 · 아이빔테크놀로지 · 아이큐어 · 코오롱글로텍 · 탑선 · 트리니티항공 · 티케이지휴켐스 · 파멥신.
-  DART 사업보고서 PDF 원문의 `VIII. 임원 및 직원 등에 관한 사항`에서 임원 명단·직원 현황·이사·감사 보수·개인별 5억원 이상 보수·주식매수선택권 유무를 추출했습니다.
-초기 진입 시 KR 첫 문서가 자동 선택되어 바로 렌더링됩니다.
+### KR — DART 사업·분기보고서 (실제 21개사)
+에스앤디 · 비보존제약 · 프리시젼바이오 · 한텍 · 현대자동차 · 수성웹툰 · 코스모화학 · 차바이오텍 · 신한알파리츠 · 삼천당제약 · 동성제약 · 디와이디 · 세토피아 · 쌍방울 · 아이빔테크놀로지 · 아이큐어 · 코오롱글로텍 · 탑선 · 트리니티항공 · 티케이지휴켐스 · 파멥신.
+초기 진입 시 KR 첫 문서가 자동 선택됩니다. (드롭다운 옵션이 22로 보이면 "선택 안됨" placeholder 1개 포함 — 실제 회사는 21개사.)
 
-### KR 원문 PDF 추출 11개사 — 범위 / 주의
-- **반영 항목**: 회사·문서유형(정정 여부)·기준일 · 임원 명단(성명·직위·구분·상근) · 직원 수(정규/기간제)·1인 평균급여 · 이사·감사 전체 보수총액·유형별 보수 · 주주총회 승인 한도 · 개인별 5억원 이상 보수 · 주식매수선택권 부여 여부.
-- **원문 표 참조(추가 정형화 대상)**: 임원 개인별 주요경력·보유주식·재직기간, 주식매수선택권 개인별 수량·행사가·공정가치, 개인별 SCT 세부 구성.
-- **금액 단위**: 원문이 천원/백만원/원으로 혼재 → 모두 **백만원**으로 환산 표기.
-- **엣지케이스(원문 보존)**: 동성제약은 회생절차 진행 중(2025.06.23 개시 → 2026.03.27 인가) 맥락 주석 유지 · 세토피아는 2025년 이사 다수 사임으로 이사회 변동 · 아이큐어는 원문 1인평균급여 표기(73,022천원)가 연간급여총액÷인원(≈10백만원)과 불일치하여 후자 기준 표기(원문 확인 필요) 주석 유지 · 트리니티항공 등 전직 임원 5억원 이상 퇴직보수는 원문대로 보존.
+**KR 대량 임원 3개사 원문 임원현황 표(sourceTables.officers) 보강 완료** — DART 구조화 원문에서 실제 추출:
+- 현대자동차: **168 rows** (등기 12 + 미등기 156). KPI 임원 수 **481명 유지**(총원, 텍스트 명시). 기본 화면은 대표/요약 5명 표시, 원문 표 버튼/모달은 **168 rows 기준**. → KPI 총원과 원문 임원현황 표 row 수는 다를 수 있음(표에 개별 등재된 인원 기준).
+- 차바이오텍: **46 rows**.
+- 삼천당제약: **22 rows**.
 
-**US — SEC DEF 14A 실측 (총 23개사)**
-- *원문(DEF 14A 텍스트) 파싱 · CEO Pay Ratio 중심 (13개사)*: Texas Instruments · Micron · Qualcomm · UnitedHealth · Deere · Broadcom · Cisco · Boeing · Salesforce · AMD · Caterpillar · 3M · General Electric. (CEO 총보수·직원 중위보수·CEO Pay Ratio 실측)
-- *XBRL Pay-vs-Performance 실측 (10개사)*: Apple · Microsoft · Alphabet · Amazon · Meta · NVIDIA · Tesla · JPMorgan · Johnson & Johnson · Walmart.
-SEC XBRL(Item 402(v)) Pay-vs-Performance 표준 태그 기반으로 CEO/PEO 총보수(SCT), NEO 1인 평균 총보수,
-CAP(Actually Paid Compensation), 연도별 Pay vs Performance 추이를 반영합니다.
-US 드롭다운에서 10개사를 선택할 수 있습니다.
+### US — SEC DEF 14A (실제 23개사)
 
-### US 데이터 — 현재 범위 / 엣지케이스
-- **현재 정형 추출 범위 밖(추가 파싱 필요)**: CEO Pay Ratio · 직원 중위보수 · 이사회 전체 명단 ·
-  개인별 SCT 구성요소(급여/상여/주식/옵션 세부 분해) · Outstanding Equity 수량 · 전체 NEO 로스터.
-  → 임의 생성하지 않고 UI/HANDOFF에 "추가 파싱 필요"로 명시했습니다.
-- **CEO/PEO 중심 임원 표**는 현재 데이터 범위의 한계이며, 빈값처럼 보이지 않도록 안내 라벨을 유지합니다.
-- **연차/엣지케이스 원문 보존**: JNJ·NVIDIA처럼 CEO 교체연도·회계연도 시프트로 PvP 연차가 4개이거나
-  연도 라벨이 다른 경우 임의로 5개년에 맞추지 않고 원문/XBRL 기준 그대로 유지합니다.
-- **Tesla(Elon Musk)**: 연간 SCT 총보수가 사실상 $0(2018년 일괄 옵션 맥락)이므로 "—" 및 맥락 주석을 유지합니다.
-- **Amazon(Andrew Jassy)**: 낮은 SCT도 임의 보정 없이 XBRL 실측치 기준으로 유지합니다.
+**(A) DEF 14A 텍스트 원문 13개사 — SCT/NEO 반영 완료**
+Texas Instruments · Micron · Qualcomm · UnitedHealth · Deere · Broadcom · Cisco · Boeing · Salesforce · AMD · Caterpillar · 3M · General Electric.
+- 최신 회계연도 Summary Compensation Table 기반 **개인별 보수 상세**(급여·상여·주식·옵션·비주식인센티브·기타·총보수) + **NEO 임원 현황** 표시.
+- `sourceTables.summaryCompensation` 원문 표 모달 연결(버튼 count = 모달 row count).
+- CEO total = Pay Ratio total 검산 notes 유지. UnitedHealth는 SCT CEO total과 Pay Ratio CEO total 약 $17K 차이 — 원문값 보존 + 차이 notes 유지.
+- **US SCT 과거연도(다년치) rows**: 검산 전수 통과 3개사(**Micron·3M·Boeing**)는 원문 다년치 행을 원문 표 모달에 표시(기본 화면 개인별 보수 상세는 최신연도 유지). 나머지 10개사는 회사별 표 형식 이질성으로 검산/귀속이 불확실해 미반영(최신연도 유지) — 별도 라운드 대상. 현재 사용자 화면에는 내부 작업 문구를 노출하지 않습니다.
 
-## 외부 의존성
+**(B) PvP 중심 10개사 — CEO/PEO 보상-성과 정보 중심**
+Apple · Microsoft · Alphabet · Amazon · Meta · NVIDIA · Tesla · JPMorgan · Johnson & Johnson · Walmart.
+- 현재 연결된 원문이 보상-성과(Pay vs Performance) 공시 중심입니다. Summary Compensation Table / Director Compensation 전체 원문은 연결되지 않았습니다.
+- 이 10개사에 SCT/이사회 전체 명단을 **억지로 주입하지 않습니다**. 개인별 보수 상세 등 미연결 항목은 `현재 확인할 수 없습니다` null-state로 처리하며, CEO/PEO 1명이 전체 임원/이사회처럼 보이지 않도록 안내 문구를 둡니다.
 
-- 폰트 CDN: Google Fonts(Inter), jsDelivr(Pretendard). 네트워크 차단 환경에서는 시스템 폰트로 대체되며 동작에는 영향이 없습니다.
-- 그 외 런타임 라이브러리는 `index.html` 내부에 인라인되어 있어 오프라인에서도 실행됩니다.
+## 원문 표 보기 모달
 
-## 주의사항
+- 모달은 기본 화면 요약(summary) rows가 아니라 **sourceTables rows**를 표시합니다(둘은 분리).
+- **버튼 count = 모달 row count = sourceTables rows** (KR 현대차 168 / 차바이오텍 46 / 삼천당 22, US 13개사 각 SCT rows).
+- 모달 내부에서 가로/세로 스크롤하며, 페이지 전체 가로스크롤은 발생하지 않습니다. source table은 `word-break: keep-all` 계열로 짧은 단어가 세로로 쪼개지지 않게 처리합니다. 390/430 모바일에서도 닫기 버튼에 접근할 수 있습니다.
 
-- 본 산출물은 임시 검증/시연용입니다.
-- 회사별 데이터는 현재 단일 HTML 내부에 포함되어 있습니다(외부 JSON 분리는 이번 release에서 진행하지 않음).
-- 향후 운영 구조에서는 `/data/*.json` 외부화 및 단일 렌더러 구조 분리를 권장합니다(`HANDOFF.md` 참조).
+## 반응형
+
+- 모바일: 임원 및 이사 현황은 기본 3명 표시 후 더보기/접기. 개인별 보수 상세는 요약카드를 유지하고 상세카드 3명 표시 후 더보기/접기.
+- 원문 표 모달은 내부 가로/세로 스크롤, 페이지 전체 가로스크롤 0.
+- 개인별 보수 구성 막대 차트는 모바일에서 **카드 내부 가로 스크롤**(막대 고정폭 + `overflow-x:auto`)로 표시되어 막대/이름이 압축되지 않으며, 페이지 전체 가로스크롤은 발생하지 않습니다.
+
+## null-state
+
+사용자 화면 null-state 제목은 2종으로 통일합니다: **`해당사항 없음`** / **`현재 확인할 수 없습니다`**.
