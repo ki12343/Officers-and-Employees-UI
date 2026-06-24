@@ -13,6 +13,7 @@
 <helmet>
 <script src="kr-ext-data.js"></script>
 <script src="us-sct-data.js"></script>
+<script src="us-pvp-sct-data.js"></script>
 <script src="kr-officers-data.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1031,6 +1032,59 @@ html,body{margin:0;padding:0;background:#070D18}
           <p style="margin:0;font-size:13.5px;color:#8190A8;line-height:1.55;">개발자가 바로 구현할 수 있도록 데이터 추출 프롬프트, 공통 구조, KR/US 매핑, empty state·단위·출처 규칙, 반응형, QA를 정리했습니다.</p>
         </div>
 
+        <!-- 검증 범위 / 데이터 적용 상태 -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px;">
+          <div style="background:#0E1726;border:1px solid rgba(96,165,250,0.30);border-radius:16px;padding:18px 20px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#93C5FD;margin-bottom:10px;">검증 범위 요약</div>
+            <div style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;color:#CBD5E1;line-height:1.5;">
+              <div style="display:flex;justify-content:space-between;gap:10px;"><span style="color:#8190A8;">KR DART</span><span style="color:#F1F5F9;font-weight:600;">21개사</span></div>
+              <div style="display:flex;justify-content:space-between;gap:10px;"><span style="color:#8190A8;">US DEF 14A SCT/NEO</span><span style="color:#F1F5F9;font-weight:600;">13개사</span></div>
+              <div style="display:flex;justify-content:space-between;gap:10px;"><span style="color:#8190A8;">US PvP 중심</span><span style="color:#F1F5F9;font-weight:600;">10개사</span></div>
+              <div style="display:flex;justify-content:space-between;gap:10px;border-top:1px solid rgba(120,150,190,0.16);padding-top:7px;margin-top:2px;"><span style="color:#8190A8;">총 검증 대상</span><span style="color:#60A5FA;font-weight:700;">44개사/문서</span></div>
+            </div>
+            <div style="margin-top:12px;padding-top:11px;border-top:1px solid rgba(120,150,190,0.16);font-size:11.5px;color:#8190A8;line-height:1.6;">
+              <div style="color:#93C5FD;font-weight:600;margin-bottom:4px;">KR 원문 표 모달 (officers sourceTables)</div>
+              현대자동차 168 rows · 차바이오텍 46 rows · 삼천당제약 22 rows
+              <div style="color:#93C5FD;font-weight:600;margin:8px 0 4px;">US SCT 다년치 allRows</div>
+              Micron 15 rows · 3M 14 rows · Boeing 8 rows
+            </div>
+          </div>
+          <div style="background:#0E1726;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:18px 20px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#93C5FD;margin-bottom:10px;">데이터 적용 상태</div>
+            <div style="display:flex;flex-direction:column;gap:11px;font-size:11.5px;color:#8190A8;line-height:1.55;">
+              <div><span style="color:#F1F5F9;font-weight:600;">KR DART 21개사</span><br>임원·직원·보수·주식보상·개인별 보수·원문 표 검증 완료. 기본 화면 summary rows ↔ 원문 표 모달 sourceTables rows 분리. 단시간 근로자 중복 합산 금지·미등기임원 기준 분리·기타비상무 분리 유지.</div>
+              <div><span style="color:#F1F5F9;font-weight:600;">US DEF 14A SCT/NEO 13개사</span><br>최신 회계연도 SCT/NEO 반영. 개인별 보수 상세 + Summary Compensation Table 원문 표 모달 연결. CEO total 검산 notes 유지. Micron·3M·Boeing은 검산 PASS분에 한해 다년치 allRows 반영.</div>
+              <div><span style="color:#F1F5F9;font-weight:600;">US DEF 14A PvP 중심 10개사</span><br>DEF 14A 원문·파싱표 기반. SCT 행 검산 PASS 9개사(Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·Johnson & Johnson·Amazon)는 개인별 보수 상세(최신 회계연도) + Summary Compensation Table 원문 표 모달(다년치) 연결 완료. 나머지 1개사(Tesla)는 SCT 표 식별/행 검산 미통과로 미연결 — PvP·CEO Pay Ratio 중심 표시 유지(원문 존재, 연결 대기). Director Compensation/officers 전체 명단은 추가 검산 대상. Pay Ratio/CAP/PvP를 SCT 개인별 보수로 둔갑시키지 않음.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 사용자 화면 금지 문구 / Release 구조 -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px;">
+          <div style="background:#0E1726;border:1px solid rgba(245,158,11,0.30);border-radius:16px;padding:18px 20px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#FBBF24;margin-bottom:10px;">사용자 화면 노출 금지 문구</div>
+            <p style="margin:0 0 10px;font-size:11.5px;color:#8190A8;line-height:1.6;">사용자 화면에는 파싱·내부 QA·미완료 상태를 직접 노출하지 않는다. null-state 제목은 아래 2개만 사용:</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+              <span style="font-size:11px;font-weight:600;color:#4ADE80;padding:3px 9px;border-radius:6px;background:rgba(34,197,94,0.10);border:1px solid rgba(34,197,94,0.30);">해당사항 없음</span>
+              <span style="font-size:11px;font-weight:600;color:#4ADE80;padding:3px 9px;border-radius:6px;background:rgba(34,197,94,0.10);border:1px solid rgba(34,197,94,0.30);">현재 확인할 수 없습니다</span>
+            </div>
+            <div style="font-size:11px;color:#7C8AA3;line-height:1.7;overflow-wrap:anywhere;">금지: 추가 추출 대상 · 추가 파싱 필요 · 파싱 필요 · 미완료 · needs_review · requires_parsing · not_in_filing · pvpStatus · XBRL · Text Parsing · ecd tag · 데이터가 아직 연결되지 않았습니다 · 안정적으로 연결되지 않았습니다 · undefined · NaN · 원문 미기재 · 미제공 · 데이터 없음 · 표준 블록 미확인 · 구조화 데이터 미제공</div>
+          </div>
+          <div style="background:#0E1726;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:18px 20px;">
+            <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#93C5FD;margin-bottom:10px;">Release 구조 (다중 파일)</div>
+            <pre style="margin:0 0 10px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#CBD5E1;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;">release/
+  index.html
+  support.js
+  kr-ext-data.js
+  kr-officers-data.js
+  us-sct-data.js
+  us-pvp-sct-data.js
+  README.md
+  HANDOFF.md</pre>
+            <div style="font-size:11px;color:#7C8AA3;line-height:1.6;">⚠ 8개 파일 구조 · index.html 단독 배포 금지 · 데이터 5종 JS(kr-ext·kr-officers·us-sct·us-pvp-sct) 함께 배포 · 단일 인라인 HTML 회귀 금지 · old/backup/copy/cache/temp/.DS_Store 포함 금지.</div>
+          </div>
+        </div>
+
         <!-- 5-1 공통 데이터 추출 프롬프트 -->
         <div style="position:relative;background:#0A111E;border:1px solid rgba(96,165,250,0.34);border-radius:16px;padding:0;margin-bottom:24px;overflow:hidden;animation:lucyGlow 4s ease-in-out infinite;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid rgba(120,150,190,0.16);background:#0E1726;">
@@ -1046,10 +1100,10 @@ html,body{margin:0;padding:0;background:#070D18}
         <!-- 5-2 공통 데이터 구조 -->
         <div style="background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:22px;margin-bottom:20px;">
           <h2 style="margin:0 0 14px;font-size:16px;font-weight:700;color:#F1F5F9;">공통 데이터 구조 요약</h2>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:10px;">
             <sc-for list="{{ structFields }}" as="s" hint-placeholder-count="11">
-              <div style="display:flex;gap:10px;align-items:baseline;padding:9px 12px;background:#0E1726;border:1px solid rgba(120,150,190,0.12);border-radius:10px;">
-                <code style="flex:none;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#60A5FA;font-weight:600;">{{ s.key }}</code>
+              <div style="display:flex;flex-direction:column;gap:4px;padding:9px 12px;background:#0E1726;border:1px solid rgba(120,150,190,0.12);border-radius:10px;">
+                <code style="font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#60A5FA;font-weight:600;white-space:normal;overflow-wrap:anywhere;word-break:normal;">{{ s.key }}</code>
                 <span style="font-size:11.5px;color:#8190A8;line-height:1.4;">{{ s.desc }}</span>
               </div>
             </sc-for>
@@ -2360,7 +2414,7 @@ class Component extends DCLogic {
     const isRatio = !!r.ratio;
     const fmtK = (n)=>{ if(n==null||isNaN(Number(n))) return '—'; return '$'+(Number(n)/1000).toFixed(1)+'K'; };
     const occLine = isRatio ? '대표이사(CEO) · 보수는 Summary Compensation Table·CEO Pay Ratio 기준' : '대표이사(PEO) · 보수는 Pay vs Performance 기준';
-    const sct = (typeof window!=='undefined' && window.US_SCT) ? window.US_SCT[keyFor(sel)] : null;
+    const sct = (typeof window!=='undefined' && (window.US_SCT||window.US_PVP_SCT)) ? ((window.US_SCT&&window.US_SCT[keyFor(sel)])||(window.US_PVP_SCT&&window.US_PVP_SCT[keyFor(sel)])||null) : null;
     const fmtM = (n)=> (n==null||n===''||isNaN(Number(n))) ? '—' : '$'+(Number(n)/1e6).toFixed(2)+'M';
     const sctIndividual = sct ? sct.rows.map(nr=>{ const isCeo=nr.name===r.ceo; const parts=[nr.salary,nr.bonus,nr.stockAwards,nr.optionAwards,nr.nonEquityIncentive,nr.allOtherCompensation].map(x=>(Number(x)||0)/1e6); return {name:nr.name, position:(nr.role? (nr.role.length>30?nr.role.slice(0,29)+'…':nr.role):(isCeo?'CEO (PEO)':'NEO')), c1:fmtM(nr.salary), c2:fmtM(nr.bonus), c3:fmtM(nr.stockAwards), c4:fmtM(nr.optionAwards), c5:fmtM(nr.nonEquityIncentive), c6:fmtM(nr.allOtherCompensation), total:fmtM(nr.total), parts, breakdown:'급여 '+fmtM(nr.salary)+' · 주식 '+fmtM(nr.stockAwards)+' · 옵션 '+fmtM(nr.optionAwards)+' · 비주식 '+fmtM(nr.nonEquityIncentive)+' (FY'+nr.fy+' · USD)'}; }) : [];
     const officersRaw = sct ? sct.rows.map(nr=>{ const isCeo=nr.name===r.ceo; return {name:nr.name, subId:(isCeo?'CEO (PEO)':'NEO'), position:(nr.role||(isCeo?'CEO':'Named Executive Officer')), badges:(isCeo?['이사','NEO']:['NEO']), status:'현직', occ:(nr.role||(isCeo?'대표이사(CEO/PEO)':'Named Executive Officer'))+' · FY'+nr.fy+' 총보수 '+fmtM(nr.total), since:'—', committee:'—'}; }) : [{name:r.ceo, subId:'CEO (PEO)', position:'CEO', badges:['이사','NEO'], status:'현직', occ:occLine, since:'—', committee:'—'}];

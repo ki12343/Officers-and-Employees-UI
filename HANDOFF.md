@@ -3,6 +3,8 @@
 KR DART 사업·분기보고서의 `VIII. 임원 및 직원 등에 관한 사항`과 US SEC `DEF 14A` 임원·이사·보상 데이터를
 **하나의 공통 스키마/렌더러**로 보여 주는 정적 산출물의 개발자 문서입니다.
 
+> **검증 범위**: KR DART 21개사 · US DEF 14A SCT/NEO 13개사 · US PvP 중심 10개사 = 총 44개사/문서. KR 원문 표 모달(officers sourceTables): 현대자동차 168 · 차바이오텍 46 · 삼천당제약 22 rows. US SCT 다년치 allRows: Micron 15 · 3M 14 · Boeing 8 rows. (앱 「핸드오프 문서」 탭에 동일 요약 카드 수록)
+
 ## 1. 배포 구조 (다중 파일)
 
 `release/` 폴더 전체를 배포합니다. **`index.html` 단독 배포 / 단일 인라인 HTML 회귀 금지.**
@@ -14,11 +16,12 @@ release/
   kr-ext-data.js      ← window.KR_EXT  (KR 원문 추출 11개사)
   kr-officers-data.js ← window.KR_OFFICERS (현대차/차바이오텍/삼천당 임원현황 원문 표)
   us-sct-data.js      ← window.US_SCT  (US SCT 13개사)
+  us-pvp-sct-data.js  ← window.US_PVP_SCT  (US PvP 6개사 SCT — Apple/MSFT/Alphabet/NVIDIA/JPM/Walmart)
   README.md
   HANDOFF.md
 ```
 
-로드 순서: `support.js` → `kr-ext-data.js` → `kr-officers-data.js` → `us-sct-data.js` (모두 `index.html` `<head>`).
+로드 순서: `support.js` → `kr-ext-data.js` → `kr-officers-data.js` → `us-sct-data.js` → `us-pvp-sct-data.js` (모두 `index.html` `<head>`). window.US_SCT / window.US_PVP_SCT는 별개 글로벌로 충돌 없음. **총 8개 파일 구조** — us-pvp-sct-data.js 누락 시 PvP 6개사 SCT 미표시.
 단일 인라인(~22MB) 시 런타임 스트리밍 렌더가 끝까지 해소되지 못해 원문 표 모달·일부 바인딩이 빈 상태로 남을 수 있어 금지합니다.
 
 ## 2. 공통 렌더러
@@ -58,11 +61,13 @@ Texas Instruments · Micron · Qualcomm · UnitedHealth · Deere · Broadcom · 
 - **과거연도(다년치) rows 확장 — 검산 통과 3개사 반영**: Micron·3M·Boeing은 SCT 표가 정렬되어(컬럼 매핑 확정·이름 carry-forward 정상) **모든 NEO 행의 구성요소 합계 = 총보수 검산 PASS, CEO 최신연도 total 일치**를 만족 → 원문 다년치 행(Micron 15행 2021/20/19, 3M 14행 2022/21/20, Boeing 8행 2022/21)을 `us-sct-data.js`의 `allRows`로 보존하고 **원문 표 모달(sourceTables.summaryCompensation)에만** 표시(버튼/모달 row count = allRows). **기본 화면 개인별 보수 상세는 최신연도 NEO만 유지**(`sct.rows`).
 - **미반영 10개사**: Texas Instruments(CEO total ~$25K 차이=각주/조정 컬럼), Caterpillar/GE/AMD/Qualcomm/UnitedHealth/Deere/Salesforce/Cisco(rowspan 이름 셀·zero-width 분산 셀·컬럼 미정렬 → row 단위 검산/귀속 불확실), Broadcom(CEO PASS이나 NEO 이름 carry-forward 불완전). **정확도 우선 원칙으로 미주입**, 최신연도 rows 유지. 회사별 전용 파서(이름/직위 splitNameRole·컬럼 위치 매핑·각주 조정 처리)가 가능한 별도 라운드 대상. 사용자 화면에는 내부 작업 문구 미노출.
 
-### (B) PvP 중심 10개사
-Apple · Microsoft · Alphabet · Amazon · Meta · NVIDIA · Tesla · JPMorgan · Johnson & Johnson · Walmart.
-- 현재 연결된 원문이 CEO/PEO 보상-성과(Pay vs Performance) 공시 중심. SCT/Director Compensation 전체 원문 미연결.
-- SCT/이사회 전체 명단을 억지로 채우지 않음. 미연결 항목은 `현재 확인할 수 없습니다` null-state. CEO/PEO 1명이 전체 임원/이사회처럼 보이지 않도록 안내 문구.
-- 엣지케이스 원문 보존: Tesla(Musk 연간 SCT 사실상 $0 — "—" + 맥락 주석), Amazon(낮은 SCT 보정 없음), JNJ/NVDA(PvP 연차/연도 라벨 원문대로).
+### (B) DEF 14A PvP 중심 10개사
+Apple · Microsoft · Alphabet · Amazon · Meta · NVIDIA · Tesla · JPMorgan · Johnson & Johnson · Walmart. (DEF 14A 원문·파싱표 `def14a_samples/<TICKER>/parsed`)
+- **SCT 연결 완료(PASS-CONNECTED) 9개사**: Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·**Johnson & Johnson**·**Amazon** — DEF 14A 파싱표(`tables_md.json`)에서 SCT를 추출, **전 행 구성요소 합계=총보수 검산 PASS**. `us-pvp-sct-data.js`(`window.US_PVP_SCT`)로 분리, usBuild의 `sct` 폴백으로 연결. 기본 화면 개인별 보수 상세 = 최신 회계연도 NEO(예: Apple 2025 5명, Amazon 2025 6명), 원문 표 모달 = 다년치 allRows(Apple 14·MSFT 13·Alphabet 14·NVIDIA 15·JPM 15·Walmart 13·Amazon 17). 버튼 count=모달 row=allRows.
+- **Amazon**(table_id 60 수동 지정): CEO/PEO Andrew R. Jassy 2025 SCT total $2,069,861. Amazon SCT는 Salary/Stock Awards/All Other/Total 4컬럼 구조(Bonus/Option/Non-Equity/Pension 없음 → null). 전 행 검산 PASS(Garman·Herrington 2024 행만 $1 반올림 차이). PvP 보조표(table_id 63/64)는 SCT로 오선택하지 않음.
+- **미연결(FOUND-NOT-CONNECTED) 1개사**: Tesla(파싱표에서 SCT 표 식별/행 정렬 실패; Musk 보수구조 특이). 정확도 우선 원칙으로 미주입, 기존 PvP/CEO Pay Ratio 중심 표시 유지. 원문·파싱표는 존재하므로 "원문 없음"이 아니라 "UI 연결 대기".
+- Director Compensation/officers 전체 명단은 이번 라운드 미연결(파싱표 식별·검산 추가 필요). SCT/이사회 전체 명단을 억지로 채우지 않음.
+- 엣지케이스 원문 보존: Tesla(Musk 연간 SCT 사실상 $0 — "—" + 맥락 주석), Amazon(낮은 SCT 보정 없음), JNJ/NVDA(PvP 연차/연도 라벨 원문대로). Pay Ratio/CAP/PvP 값을 SCT 개인별 보수로 둔갑시키지 않음.
 
 ## 6. null-state / 반응형
 

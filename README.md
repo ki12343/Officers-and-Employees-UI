@@ -18,13 +18,14 @@ release/
   kr-ext-data.js      ← KR 원문 추출 11개사 데이터 (window.KR_EXT)
   kr-officers-data.js ← KR 임원현황 원문 표 (현대차/차바이오텍/삼천당, window.KR_OFFICERS)
   us-sct-data.js      ← US Summary Compensation Table 13개사 (window.US_SCT)
+  us-pvp-sct-data.js  ← US PvP 중심 6개사 SCT (window.US_PVP_SCT — Apple/MSFT/Alphabet/NVIDIA/JPM/Walmart)
   README.md
   HANDOFF.md
 ```
 
 - **GitHub Pages**: 폴더 업로드 후 Settings > Pages에서 branch/경로 지정.
 - **Vercel / Netlify**: `release/` 폴더 업로드, Framework=Static/Other, Build Command 비움, Output=`.`.
-- 스크립트 로드 순서는 `support.js` → `kr-ext-data.js` → `kr-officers-data.js` → `us-sct-data.js`이며 `index.html` `<head>`에 포함되어 있습니다.
+- 스크립트 로드 순서는 `support.js` → `kr-ext-data.js` → `kr-officers-data.js` → `us-sct-data.js` → `us-pvp-sct-data.js`이며 `index.html` `<head>`에 포함되어 있습니다. (`us-sct-data.js`와 `us-pvp-sct-data.js`는 서로 다른 글로벌(window.US_SCT / window.US_PVP_SCT)을 써 충돌 없음.) **us-pvp-sct-data.js 누락 시 PvP 6개사의 개인별 보수 상세·원문 SCT 모달 데이터가 빠집니다.**
 
 > ⚠ **단일 인라인 HTML 금지**: 모든 데이터를 하나의 HTML에 인라인하면 ~22MB로 비대해져 런타임 스트리밍 렌더가 끝까지 해소되지 못하고, 원문 표 모달·일부 바인딩이 빈 상태로 남을 수 있습니다. 반드시 위 7개 파일을 함께 배포하세요.
 
@@ -48,10 +49,11 @@ Texas Instruments · Micron · Qualcomm · UnitedHealth · Deere · Broadcom · 
 - CEO total = Pay Ratio total 검산 notes 유지. UnitedHealth는 SCT CEO total과 Pay Ratio CEO total 약 $17K 차이 — 원문값 보존 + 차이 notes 유지.
 - **US SCT 과거연도(다년치) rows**: 검산 전수 통과 3개사(**Micron·3M·Boeing**)는 원문 다년치 행을 원문 표 모달에 표시(기본 화면 개인별 보수 상세는 최신연도 유지). 나머지 10개사는 회사별 표 형식 이질성으로 검산/귀속이 불확실해 미반영(최신연도 유지) — 별도 라운드 대상. 현재 사용자 화면에는 내부 작업 문구를 노출하지 않습니다.
 
-**(B) PvP 중심 10개사 — CEO/PEO 보상-성과 정보 중심**
+**(B) DEF 14A PvP 중심 10개사 — CEO/PEO 보상-성과 정보 중심**
 Apple · Microsoft · Alphabet · Amazon · Meta · NVIDIA · Tesla · JPMorgan · Johnson & Johnson · Walmart.
-- 현재 연결된 원문이 보상-성과(Pay vs Performance) 공시 중심입니다. Summary Compensation Table / Director Compensation 전체 원문은 연결되지 않았습니다.
-- 이 10개사에 SCT/이사회 전체 명단을 **억지로 주입하지 않습니다**. 개인별 보수 상세 등 미연결 항목은 `현재 확인할 수 없습니다` null-state로 처리하며, CEO/PEO 1명이 전체 임원/이사회처럼 보이지 않도록 안내 문구를 둡니다.
+- **SCT 연결 완료 9개사**: Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·Johnson & Johnson·Amazon(SCT 수동 지정, Jassy 2025 total $2,069,861 검산 PASS; PvP 보조표 미사용). 행 검산 PASS분만 연결.연도 NEO, 원문 표 모달=다년치 전체 행(`us-pvp-sct-data.js`). 버튼 count=모달 row.
+- **미연결 1개사**: Tesla(SCT 표 셀 분산으로 행 정렬 실패) — 정확도 우선으로 미주입, PvP/CEO Pay Ratio 중심 표시 유지(원문·파싱표는 존재, 연결 대기).
+- SCT/이사회 전체 명단을 **억지로 주입하지 않습니다**. 미연결 항목은 `현재 확인할 수 없습니다` null-state, CEO/PEO 1명이 전체 임원/이사회처럼 보이지 않도록 안내. Pay Ratio/CAP/PvP를 SCT 개인별 보수로 둔갑시키지 않음.
 
 ## 원문 표 보기 모달
 
