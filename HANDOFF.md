@@ -63,11 +63,12 @@ Texas Instruments · Micron · Qualcomm · UnitedHealth · Deere · Broadcom · 
 
 ### (B) DEF 14A PvP 중심 10개사
 Apple · Microsoft · Alphabet · Amazon · Meta · NVIDIA · Tesla · JPMorgan · Johnson & Johnson · Walmart. (DEF 14A 원문·파싱표 `def14a_samples/<TICKER>/parsed`)
-- **SCT 연결 완료(PASS-CONNECTED) 9개사**: Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·**Johnson & Johnson**·**Amazon** — DEF 14A 파싱표(`tables_md.json`)에서 SCT를 추출, **전 행 구성요소 합계=총보수 검산 PASS**. `us-pvp-sct-data.js`(`window.US_PVP_SCT`)로 분리, usBuild의 `sct` 폴백으로 연결. 기본 화면 개인별 보수 상세 = 최신 회계연도 NEO(예: Apple 2025 5명, Amazon 2025 6명), 원문 표 모달 = 다년치 allRows(Apple 14·MSFT 13·Alphabet 14·NVIDIA 15·JPM 15·Walmart 13·Amazon 17). 버튼 count=모달 row=allRows.
+- **SCT 연결 완료(PASS-CONNECTED) 10개사 전부**: Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·**Johnson & Johnson**·**Amazon**·**Tesla** — DEF 14A 파싱표(`tables_md.json`)에서 SCT를 추출, **전 행 구성요소 합계=총보수 검산 PASS**. `us-pvp-sct-data.js`(`window.US_PVP_SCT`)로 분리, usBuild의 `sct` 폴백으로 연결. 기본 화면 개인별 보수 상세 = 최신 회계연도 NEO(예: Apple 2025 5명, Amazon 2025 6명), 원문 표 모달 = 다년치 allRows(Apple 14·MSFT 13·Alphabet 14·NVIDIA 15·JPM 15·Walmart 13·Amazon 17). 버튼 count=모달 row=allRows.
 - **Amazon**(table_id 60 수동 지정): CEO/PEO Andrew R. Jassy 2025 SCT total $2,069,861. Amazon SCT는 Salary/Stock Awards/All Other/Total 4컬럼 구조(Bonus/Option/Non-Equity/Pension 없음 → null). 전 행 검산 PASS(Garman·Herrington 2024 행만 $1 반올림 차이). PvP 보조표(table_id 63/64)는 SCT로 오선택하지 않음.
-- **미연결(FOUND-NOT-CONNECTED) 1개사**: Tesla(파싱표에서 SCT 표 식별/행 정렬 실패; Musk 보수구조 특이). 정확도 우선 원칙으로 미주입, 기존 PvP/CEO Pay Ratio 중심 표시 유지. 원문·파싱표는 존재하므로 "원문 없음"이 아니라 "UI 연결 대기".
+- **Tesla**(table_id 84 수동 지정): 정식 SCT(Name/Year/Salary/Bonus/Stock/Option/Non-Equity/All Other/Total). CEO/PEO **Elon Musk는 FY2022~2024 전 연도 보수 미수령(원문 "—") → null 그대로 표시**(2018/2025 CEO Performance Award·PvP·CAP·옵션표는 SCT로 오매핑하지 않음). FY2024 NEO 4명(Musk·Taneja·Zhu·Baglino), allRows 10행, 비-Musk 행 전수 검산 PASS. 오염 표(Apple/Tim Cook 데이터가 섞인 table 214/216/218/219)·PvP 표(83/85~89/223)·2025 성과보상 추정표(53)는 배제.
+- **미연결 0개사**: PvP-10 SCT 전부 연결 완료.심 표시 유지. 원문·파싱표는 존재하므로 "원문 없음"이 아니라 "UI 연결 대기".
 - Director Compensation/officers 전체 명단은 이번 라운드 미연결(파싱표 식별·검산 추가 필요). SCT/이사회 전체 명단을 억지로 채우지 않음.
-- 엣지케이스 원문 보존: Tesla(Musk 연간 SCT 사실상 $0 — "—" + 맥락 주석), Amazon(낮은 SCT 보정 없음), JNJ/NVDA(PvP 연차/연도 라벨 원문대로). Pay Ratio/CAP/PvP 값을 SCT 개인별 보수로 둔갑시키지 않음.
+- 엣지케이스 원문 보존: Tesla(Musk 연간 SCT 전액 미수령 "—" 원문 그대로 + 맥락 주석), Amazon(낮은 SCT 보정 없음), JNJ/NVDA(PvP 연차/연도 라벨 원문대로). Pay Ratio/CAP/PvP 값을 SCT 개인별 보수로 둔갑시키지 않음.
 
 ## 6. null-state / 반응형
 

@@ -51,8 +51,8 @@ Texas Instruments · Micron · Qualcomm · UnitedHealth · Deere · Broadcom · 
 
 **(B) DEF 14A PvP 중심 10개사 — CEO/PEO 보상-성과 정보 중심**
 Apple · Microsoft · Alphabet · Amazon · Meta · NVIDIA · Tesla · JPMorgan · Johnson & Johnson · Walmart.
-- **SCT 연결 완료 9개사**: Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·Johnson & Johnson·Amazon(SCT 수동 지정, Jassy 2025 total $2,069,861 검산 PASS; PvP 보조표 미사용). 행 검산 PASS분만 연결.연도 NEO, 원문 표 모달=다년치 전체 행(`us-pvp-sct-data.js`). 버튼 count=모달 row.
-- **미연결 1개사**: Tesla(SCT 표 셀 분산으로 행 정렬 실패) — 정확도 우선으로 미주입, PvP/CEO Pay Ratio 중심 표시 유지(원문·파싱표는 존재, 연결 대기).
+- **SCT 연결 완료 10개사 전부**: Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·Johnson & Johnson·Amazon·Tesla(SCT 수동 지정, Jassy 2025 total $2,069,861 검산 PASS; PvP 보조표 미사용). 행 검산 PASS분만 연결.연도 NEO, 원문 표 모달=다년치 전체 행(`us-pvp-sct-data.js`). 버튼 count=모달 row.
+- **Tesla**: CEO Elon Musk는 SCT 보수 전액 미수령(원문 "—") → null 그대로 표시. FY2024 NEO 4명·allRows 10행 연결, 2018/2025 CEO Performance Award·PvP·옵션표는 SCT로 오매핑하지 않음.
 - SCT/이사회 전체 명단을 **억지로 주입하지 않습니다**. 미연결 항목은 `현재 확인할 수 없습니다` null-state, CEO/PEO 1명이 전체 임원/이사회처럼 보이지 않도록 안내. Pay Ratio/CAP/PvP를 SCT 개인별 보수로 둔갑시키지 않음.
 
 ## 원문 표 보기 모달

@@ -22,6 +22,8 @@
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;padding:0;background:#070D18}
+.dir-paid-row:last-child{border-bottom:none!important}
+.dir-lim-row:last-child{border-bottom:none!important}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-thumb{background:rgba(120,150,190,0.25);border-radius:6px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -41,6 +43,7 @@ html,body{margin:0;padding:0;background:#070D18}
   .comp-bars>div{min-width:88px!important;max-width:none!important;flex:0 0 auto!important}
   .ratio-2col{grid-template-columns:1fr!important}
   .ratio-card{min-height:200px!important}
+  .pvp-mini-left{border-right:none!important;padding-right:0!important;border-bottom:1px solid rgba(120,150,190,0.12)!important;padding-bottom:12px!important;margin-bottom:4px!important}
   .pvp-head{flex-direction:column!important;align-items:flex-start!important;gap:9px!important}
   .pvp-insight{margin-bottom:15px!important}
   .pvp-chart{margin-bottom:15px!important}
@@ -49,10 +52,15 @@ html,body{margin:0;padding:0;background:#070D18}
   .equity-3col{grid-template-columns:1fr!important}
   .equity-metrics{border-left:none!important;padding-left:0!important;border-top:1px solid rgba(120,150,190,0.14)!important;padding-top:12px!important}
   .emp-insight{border-left:none!important;padding-left:0!important;border-top:1px solid rgba(120,150,190,0.14)!important;padding-top:12px!important}
+  .emp-kpis{grid-template-columns:1fr!important}
   .doc-selects{width:100%!important}
   .doc-selects label{max-width:100%!important;flex:1 1 100%!important}
   .doc-selects select{max-width:100%!important;width:100%!important}
   .us-extra{grid-template-columns:1fr!important}
+}
+@media(min-width:768px) and (max-width:1279px){
+  .emp-2col{grid-template-columns:1fr!important}
+  .emp-insight{border-left:none!important;padding-left:0!important;border-top:1px solid rgba(120,150,190,0.14)!important;padding-top:14px!important}
 }
 @media(max-width:1023px){
   .equity-3col{grid-template-columns:auto 1fr!important}
@@ -248,7 +256,10 @@ html,body{margin:0;padding:0;background:#070D18}
                 </thead>
                 <sc-for list="{{ officerGroups }}" as="g" hint-placeholder-count="2">
                 <tbody>
-                  <tr style="background:#0B1220;"><td colspan="7" style="padding:9px 16px;font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#93C5FD;border-bottom:1px solid rgba(120,150,190,0.16);">{{ g.title }} · {{ g.count }}명</td></tr>
+                  <tr style="background:#0B1220;"><td colspan="7" style="padding:9px 16px;border-bottom:1px solid rgba(120,150,190,0.16);"><span style="font-size:10.5px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#93C5FD;">{{ g.groupLabel }}</span><span style="font-size:10.5px;font-weight:500;color:#5C6B85;margin-left:8px;text-transform:none;letter-spacing:0;">{{ g.subtitleDisp }}</span></td></tr>
+                  <sc-if value="{{ g.empty }}" hint-placeholder-val="{{ false }}">
+                    <tr><td colspan="7" style="padding:15px 16px;font-size:11.5px;color:#64748B;line-height:1.5;border-bottom:1px solid rgba(120,150,190,0.10);">{{ g.emptyText }}</td></tr>
+                  </sc-if>
                   <sc-for list="{{ g.officers }}" as="o" hint-placeholder-count="4">
                     <tr style="border-bottom:1px solid rgba(120,150,190,0.10);">
                       <td style="padding:14px 16px;vertical-align:top;">
@@ -310,6 +321,25 @@ html,body{margin:0;padding:0;background:#070D18}
               <button onClick="{{ toggleOff }}" style="width:100%;padding:11px;border-radius:10px;background:rgba(120,150,190,0.10);border:1px solid rgba(120,150,190,0.28);color:#94A3B8;font-size:12.5px;font-weight:600;font-family:inherit;cursor:pointer;">접기</button>
             </sc-if>
           </div>
+
+          <!-- 블록 C: 주요 보수 대상자 (보수 섹션 연결 인물 목록) -->
+          <sc-if value="{{ compPersonsShow }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:14px;background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:14px;padding:15px 18px;">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:11px;flex-wrap:wrap;">
+                <span style="font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#93C5FD;">{{ compPersonsTitle }}</span>
+                <span style="font-size:11px;color:#64748B;">{{ compPersonsNote }}</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <sc-for list="{{ compPersons }}" as="p" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 13px;background:#0B1424;border:1px solid rgba(120,150,190,0.14);border-radius:9px;">
+                    <span style="font-size:12.5px;font-weight:600;color:#F1F5F9;">{{ p.name }}</span>
+                    <span style="font-size:11px;color:#64748B;">{{ p.position }}</span>
+                    <span style="font-size:12.5px;font-weight:700;color:#60A5FA;">{{ p.total }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
         </section>
 
         <sc-if value="{{ rosterModalOpen }}" hint-placeholder-val="{{ false }}">
@@ -366,42 +396,58 @@ html,body{margin:0;padding:0;background:#070D18}
 
           <!-- 사업부문별 직원 수 · 성별 구성 (summary hero, 표 위) -->
           <sc-if value="{{ employeesAvailable }}" hint-placeholder-val="{{ false }}">
-            <div style="margin-bottom:18px;background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:14px;padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;" class="chart-2col">
-              <div>
+            <div style="margin-bottom:18px;background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:14px;padding:18px 20px;display:grid;grid-template-columns:1.45fr 1fr;gap:20px;align-items:stretch;" class="chart-2col emp-2col">
+              <div style="display:flex;flex-direction:column;">
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
-                  <span style="font-size:11.5px;font-weight:600;color:#8190A8;">사업부문별 직원 수 · 성별 구성</span>
+                  <span style="font-size:11.5px;font-weight:600;color:#8190A8;">{{ empChartTitle }}</span>
+                  <sc-if value="{{ empHasGenderSplit }}" hint-placeholder-val="{{ true }}">
                   <div style="display:flex;gap:12px;">
                     <div style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#60A5FA;"></span><span style="font-size:11px;color:#94A3B8;">남</span></div>
                     <div style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#F472B6;"></span><span style="font-size:11px;color:#94A3B8;">여</span></div>
                   </div>
+                  </sc-if>
                 </div>
-                <div style="display:flex;align-items:flex-end;gap:24px;height:150px;padding:0 8px;justify-content:center;">
-                  <sc-for list="{{ empColumns }}" as="c" hint-placeholder-count="2">
-                    <div style="flex:1;max-width:96px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;">
-                      <span style="font-size:12.5px;font-weight:700;color:#DCE6F5;margin-bottom:6px;">{{ c.totalDisp }}</span>
-                      <div style="width:100%;height:100%;display:flex;align-items:flex-end;">
-                        <div style="width:100%;display:flex;flex-direction:column;border-radius:6px 6px 0 0;overflow:hidden;{{ c.colStyle }}">
-                          <sc-for list="{{ c.segs }}" as="s" hint-placeholder-count="2"><div style="{{ s.segStyle }}"></div></sc-for>
+                <sc-if value="{{ empGraphShow }}" hint-placeholder-val="{{ true }}">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:180px;">
+                  <div style="width:100%;display:flex;align-items:flex-end;gap:18px;height:160px;padding:0 4px;justify-content:center;">
+                    <sc-for list="{{ empColumns }}" as="c" hint-placeholder-count="2">
+                      <div style="flex:1;max-width:118px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;">
+                        <span style="font-size:12.5px;font-weight:700;color:#DCE6F5;margin-bottom:6px;">{{ c.totalDisp }}</span>
+                        <div style="width:100%;height:100%;display:flex;align-items:flex-end;">
+                          <div style="width:100%;display:flex;flex-direction:column;border-radius:6px 6px 0 0;overflow:hidden;{{ c.colStyle }}">
+                            <sc-for list="{{ c.segs }}" as="s" hint-placeholder-count="2"><div style="{{ s.segStyle }}"></div></sc-for>
+                          </div>
                         </div>
+                        <span style="font-size:11.5px;color:#94A3B8;margin-top:9px;">{{ c.div }}</span>
                       </div>
-                      <span style="font-size:11.5px;color:#94A3B8;margin-top:9px;">{{ c.div }}</span>
-                    </div>
-                  </sc-for>
+                    </sc-for>
+                  </div>
                 </div>
+                </sc-if>
+                <sc-if value="{{ empAxisNote }}" hint-placeholder-val="{{ false }}">
+                <div style="flex:1;display:flex;align-items:center;justify-content:center;min-height:160px;">
+                  <div style="display:flex;align-items:flex-start;gap:9px;max-width:340px;padding:14px 16px;background:#0B1424;border:1px solid rgba(120,150,190,0.14);border-radius:10px;font-size:11.5px;color:#94A3B8;line-height:1.55;"><span style="flex:none;color:#60A5FA;">ⓘ</span><span>{{ empAxisNote }}</span></div>
+                </div>
+                </sc-if>
               </div>
-              <div style="display:flex;flex-direction:column;gap:12px;border-left:1px solid rgba(120,150,190,0.14);padding-left:20px;" class="emp-insight">
+              <div style="display:flex;flex-direction:column;gap:14px;border-left:1px solid rgba(120,150,190,0.14);padding-left:20px;" class="emp-insight">
                 <div style="font-size:11.5px;font-weight:600;color:#8190A8;">핵심 요약</div>
-                <div style="display:flex;gap:20px;">
-                  <div><div style="font-size:11px;color:#64748B;">총 직원</div><div style="font-size:18px;font-weight:700;color:#F1F5F9;margin-top:2px;">{{ empInsight.total }}<span style="font-size:11px;color:#64748B;">명</span></div></div>
-                  <div><div style="font-size:11px;color:#64748B;">사업부문</div><div style="font-size:18px;font-weight:700;color:#F1F5F9;margin-top:2px;">{{ empInsight.divCount }}<span style="font-size:11px;color:#64748B;">개</span></div></div>
+                <div style="display:flex;flex-direction:column;background:#0B1424;border:1px solid rgba(120,150,190,0.14);border-radius:10px;overflow:hidden;" class="emp-kpis">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 15px;" class="emp-kpi-row">
+                    <span style="font-size:12px;color:#94A3B8;">총 직원</span>
+                    <span style="font-size:20px;font-weight:700;color:#F1F5F9;line-height:1;">{{ empInsight.total }}<span style="font-size:11px;color:#64748B;font-weight:500;margin-left:2px;">명</span></span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 15px;border-top:1px solid rgba(120,150,190,0.10);" class="emp-kpi-row">
+                    <span style="font-size:12px;color:#94A3B8;">{{ empAxisLabel }}</span>
+                    <span style="font-size:20px;font-weight:700;color:#F1F5F9;line-height:1;">{{ empInsight.divCount }}<span style="font-size:11px;color:#64748B;font-weight:500;margin-left:2px;">개</span></span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 15px;border-top:1px solid rgba(120,150,190,0.10);" class="emp-kpi-row">
+                    <span style="font-size:12px;color:#94A3B8;">{{ empTopLabel }}</span>
+                    <span style="font-size:15px;font-weight:700;color:#60A5FA;line-height:1.1;text-align:right;">{{ empInsight.topDiv }} · {{ empInsight.topVal }}명</span>
+                  </div>
                 </div>
-                <div><div style="font-size:11px;color:#64748B;">최다 인원 부문</div><div style="font-size:13.5px;font-weight:600;color:#60A5FA;margin-top:2px;">{{ empInsight.topDiv }} · {{ empInsight.topVal }}명</div></div>
-                <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                  <sc-for list="{{ empChips }}" as="c" hint-placeholder-count="4">
-                    <span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 9px;border-radius:6px;background:rgba(96,165,250,0.10);border:1px solid rgba(96,165,250,0.24);color:#94A3B8;"><span style="color:#64748B;">{{ c.label }}</span><span style="color:#DCE6F5;font-weight:600;">{{ c.value }}</span></span>
-                  </sc-for>
-                </div>
-                <div style="font-size:11px;color:#5C6B85;line-height:1.5;">평균근속 6.8~9.4년 · 1인 평균급여 62~76백만원 (성별·부문별 상세는 표 참조)</div>
+                <div style="font-size:11px;color:#7A8AA3;line-height:1.5;">{{ empSummaryEmployment }}</div>
+                <div style="margin-top:auto;font-size:10.5px;color:#5C6B85;line-height:1.5;border-top:1px solid rgba(120,150,190,0.10);padding-top:10px;">{{ empSummaryMetric }}</div>
               </div>
             </div>
           </sc-if>
@@ -468,11 +514,36 @@ html,body{margin:0;padding:0;background:#070D18}
             </div>
             </div>
           </sc-if>
-          <sc-if value="{{ employeesEmpty }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ employeesEmptyKR }}" hint-placeholder-val="{{ false }}">
             <div style="border:1px dashed rgba(120,150,190,0.28);border-radius:14px;padding:30px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;">
               <span style="font-size:26px;opacity:0.4;line-height:1;">∅</span>
               <div style="font-size:13.5px;font-weight:600;color:#94A3B8;">{{ employeesEmptyTitle }}</div>
               <div style="font-size:11.5px;color:#64748B;line-height:1.6;max-width:540px;">{{ employeesEmptyText }}</div>
+            </div>
+          </sc-if>
+
+          <!-- US: 직원 보상(중위보수) 하위 블록 — KR식 직원 표 대신 Median Employee Pay 흡수 -->
+          <sc-if value="{{ usEmployeeShow }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:14px;padding:18px 20px;">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap;">
+                <span style="font-size:12.5px;font-weight:600;color:#CBD5E1;">직원 보상 · 직원 중위보수</span>
+                <span style="font-size:10px;font-weight:600;color:#A78BFA;padding:3px 9px;border-radius:6px;background:rgba(139,92,246,0.12);border:1px solid rgba(167,139,250,0.30);">SEC Item 402(u)</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
+                <div style="background:#0B1424;border:1px solid rgba(120,150,190,0.14);border-radius:10px;padding:13px 15px;">
+                  <div style="font-size:11px;color:#64748B;">직원 중위보수 (Median)</div>
+                  <div style="font-size:21px;font-weight:700;color:#F1F5F9;margin-top:5px;line-height:1;">{{ usEmpMedianDisp }}</div>
+                </div>
+                <div style="background:#0B1424;border:1px solid rgba(120,150,190,0.14);border-radius:10px;padding:13px 15px;">
+                  <div style="font-size:11px;color:#64748B;">CEO 총보수 (SCT)</div>
+                  <div style="font-size:21px;font-weight:700;color:#F1F5F9;margin-top:5px;line-height:1;">{{ usEmpCeoTotalDisp }}</div>
+                </div>
+                <div style="background:#0B1424;border:1px solid rgba(120,150,190,0.14);border-radius:10px;padding:13px 15px;">
+                  <div style="font-size:11px;color:#64748B;">CEO–직원 보수배율</div>
+                  <div style="font-size:21px;font-weight:700;color:#60A5FA;margin-top:5px;line-height:1;">{{ usEmpRatioDisp }}</div>
+                </div>
+              </div>
+              <div style="margin-top:13px;display:flex;align-items:flex-start;gap:8px;padding:10px 13px;background:rgba(59,130,246,0.06);border:1px solid rgba(96,165,250,0.20);border-radius:9px;font-size:11px;color:#94A3B8;line-height:1.55;"><span style="flex:none;color:#60A5FA;">ℹ</span><span>{{ usEmployeeNote }}</span></div>
             </div>
           </sc-if>
 
@@ -536,12 +607,11 @@ html,body{margin:0;padding:0;background:#070D18}
         <section class="lucy-sec" style="margin-bottom:32px;">
           <div style="display:flex;align-items:center;gap:10px;margin:0 0 16px;flex-wrap:wrap;">
             <h2 style="margin:0;font-size:17px;font-weight:700;color:#F1F5F9;">{{ comp48Title }}</h2>
-            <span style="font-size:10.5px;font-weight:600;color:#93C5FD;padding:3px 9px;border-radius:6px;background:rgba(59,130,246,0.12);border:1px solid rgba(96,165,250,0.30);">{{ dirBadge }}</span>
           </div>
           <sc-if value="{{ compContextNote }}" hint-placeholder-val="{{ false }}">
             <div style="margin:0 0 14px;display:flex;align-items:flex-start;gap:8px;padding:10px 13px;background:rgba(59,130,246,0.07);border:1px solid rgba(96,165,250,0.22);border-radius:9px;font-size:11.5px;color:#94A3B8;line-height:1.55;"><span style="flex:none;color:#60A5FA;">ℹ</span><span>{{ compContextNote }}</span></div>
           </sc-if>
-          <sc-if value="{{ dirHasAny }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ dirHasAnyKR }}" hint-placeholder-val="{{ true }}">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
             <!-- 왼쪽: 보수 한도 / 정책 -->
             <div style="background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:20px;">
@@ -549,7 +619,7 @@ html,body{margin:0;padding:0;background:#070D18}
               <sc-if value="{{ dirLimitAvailable }}" hint-placeholder-val="{{ true }}">
                 <div>
                 <sc-for list="{{ dirLimitRows }}" as="a" hint-placeholder-count="2">
-                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid rgba(120,150,190,0.10);">
+                  <div class="dir-lim-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid rgba(120,150,190,0.10);">
                     <div><div style="font-size:13px;color:#DCE6F5;">{{ a.label }}</div><div style="font-size:11px;color:#64748B;margin-top:2px;">{{ a.sub }}</div></div>
                     <div style="font-size:14px;font-weight:600;color:#F1F5F9;white-space:nowrap;">{{ a.amount }}</div>
                   </div>
@@ -557,8 +627,7 @@ html,body{margin:0;padding:0;background:#070D18}
                 </div>
               </sc-if>
               <sc-if value="{{ dirLimitEmpty }}" hint-placeholder-val="{{ false }}">
-                <div style="border:1px dashed rgba(120,150,190,0.28);border-radius:12px;padding:22px 16px;text-align:center;">
-                  <div style="font-size:12.5px;font-weight:600;color:#94A3B8;margin-bottom:4px;">해당사항 없음</div>
+                <div style="border:1px dashed rgba(120,150,190,0.28);border-radius:12px;padding:18px 16px;text-align:center;">
                   <div style="font-size:11.5px;color:#64748B;line-height:1.55;">{{ dirLimitEmptyText }}</div>
                 </div>
               </sc-if>
@@ -569,7 +638,7 @@ html,body{margin:0;padding:0;background:#070D18}
                 </div>
               </sc-if>
               <!-- 승인 한도 대비 지급률 (동일 카드 통합) -->
-              <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(120,150,190,0.12);">
+              <div style="margin-top:18px;">
                 <div style="font-size:11.5px;font-weight:600;color:#8190A8;margin-bottom:12px;">승인 한도 대비 지급률</div>
                 <sc-if value="{{ budgetAvailable }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-wrap:wrap;gap:20px;">
@@ -596,7 +665,7 @@ html,body{margin:0;padding:0;background:#070D18}
             <div style="background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:20px;">
               <div style="font-size:13px;font-weight:600;color:#4ADE80;margin-bottom:14px;">실제 지급액</div>
               <sc-for list="{{ dirPaidRows }}" as="p" hint-placeholder-count="3">
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid rgba(120,150,190,0.10);">
+                <div class="dir-paid-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid rgba(120,150,190,0.10);">
                   <div style="min-width:0;">
                     <div style="display:flex;align-items:center;gap:4px;"><span style="font-size:13px;color:#DCE6F5;">{{ p.label }}</span><span style="display:{{ p.outsideBadge }}">한도 외</span></div>
                     <div style="font-size:11px;color:#64748B;margin-top:2px;">{{ p.sub }}</div>
@@ -605,20 +674,48 @@ html,body{margin:0;padding:0;background:#070D18}
                 </div>
               </sc-for>
               <sc-if value="{{ dirPaidEmpty }}" hint-placeholder-val="{{ false }}">
-                <div style="border:1px dashed rgba(120,150,190,0.28);border-radius:12px;padding:22px 16px;text-align:center;">
-                  <div style="font-size:12.5px;font-weight:600;color:#94A3B8;margin-bottom:4px;">{{ dirPaidEmptyTitle }}</div>
-                  <div style="font-size:11.5px;color:#64748B;line-height:1.55;">{{ dirPaidEmptyText }}</div>
+                <div style="display:flex;align-items:flex-start;gap:9px;padding:11px 14px;background:#0B1424;border:1px solid rgba(120,150,190,0.14);border-radius:9px;">
+                  <span style="flex:none;font-size:12px;opacity:0.5;">∅</span>
+                  <span style="font-size:11.5px;color:#94A3B8;line-height:1.55;">{{ dirPaidEmptyText }}</span>
                 </div>
               </sc-if>
             </div>
           </div>
           </sc-if>
-          <sc-if value="{{ dirBothEmpty }}" hint-placeholder-val="{{ false }}">
-            <div style="border:1px dashed rgba(120,150,190,0.28);border-radius:14px;padding:30px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;">
-              <span style="font-size:26px;opacity:0.4;line-height:1;">∅</span>
-              <div style="font-size:13.5px;font-weight:600;color:#94A3B8;">{{ dirBothEmptyTitle }}</div>
-              <div style="font-size:11.5px;color:#64748B;line-height:1.6;max-width:540px;">{{ dirBothEmptyText }}</div>
+          <sc-if value="{{ dirBothEmptyKR }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:flex-start;gap:9px;padding:12px 15px;background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:10px;">
+              <span style="flex:none;font-size:13px;opacity:0.5;line-height:1.4;">∅</span>
+              <span style="font-size:11.5px;color:#94A3B8;line-height:1.55;">{{ dirBothEmptyText }}</span>
             </div>
+          </sc-if>
+
+          <!-- US: 이사 보수 = KR과 동일한 2카드 골격(정책/기준 + 실지급) — 한도/집행률과 의미만 분기 -->
+          <sc-if value="{{ dirUSShow }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;">
+            <!-- 카드1: 보수 정책 / 기준 -->
+            <div style="background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:20px;">
+              <div style="font-size:13px;font-weight:600;color:#93C5FD;margin-bottom:14px;">보수 정책 / 기준</div>
+              <div style="font-size:12px;color:#94A3B8;line-height:1.6;">US는 보수 한도가 아닌 이사 1인별 <span style="color:#DCE6F5;">실지급 명세</span>를 공시합니다.</div>
+              <div style="margin-top:11px;padding-top:11px;border-top:1px solid rgba(120,150,190,0.12);font-size:10.5px;color:#5C6B85;line-height:1.5;">KR 한도·집행률과 공시 기준이 달라 직접 비교는 제한됩니다.</div>
+            </div>
+            <!-- 카드2: 실제 지급액 -->
+            <div style="background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:20px;">
+              <div style="font-size:13px;font-weight:600;color:#4ADE80;margin-bottom:14px;">실제 지급액</div>
+              <sc-if value="{{ dirUSHasPaid }}" hint-placeholder-val="{{ false }}">
+                <div>
+                <sc-for list="{{ dirUSPaidRows }}" as="p" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid rgba(120,150,190,0.10);">
+                    <div style="min-width:0;"><div style="font-size:13px;color:#DCE6F5;">{{ p.label }}</div><div style="font-size:11px;color:#64748B;margin-top:2px;">{{ p.sub }}</div></div>
+                    <div style="font-size:14px;font-weight:600;color:#F1F5F9;white-space:nowrap;">{{ p.amount }}</div>
+                  </div>
+                </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ dirUSEmptyShow }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:flex-start;gap:9px;padding:11px 14px;background:#0B1424;border:1px solid rgba(120,150,190,0.14);border-radius:9px;font-size:11.5px;color:#94A3B8;line-height:1.55;"><span style="flex:none;color:#60A5FA;">ⓘ</span><span><span style="color:#CBD5E1;font-weight:600;">{{ dirUSEmptyTitle }}</span> · {{ dirUSEmptyText }}</span></div>
+              </sc-if>
+            </div>
+          </div>
           </sc-if>
         </section>
 
@@ -784,12 +881,11 @@ html,body{margin:0;padding:0;background:#070D18}
           </sc-if>
         </section>
 
-        <!-- 4-10 주식보상 / 옵션 -->
+        <!-- 4-10 인센티브 및 주식보상 -->
         <section class="lucy-sec" style="margin-bottom:32px;">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
             <h2 style="margin:0;font-size:17px;font-weight:700;color:#F1F5F9;">{{ comp410Title }}</h2>
-            <span style="font-size:10.5px;font-weight:600;color:#93C5FD;padding:3px 9px;border-radius:6px;background:rgba(59,130,246,0.12);border:1px solid rgba(96,165,250,0.30);">{{ equityBadge }}</span>
-            <span style="font-size:11px;color:#5C6B85;margin-left:auto;">원문 유형 보존 · RSU · PSU · Option · 주식매수선택권</span>
+            <span style="font-size:11px;color:#5C6B85;margin-left:auto;">{{ equitySubtitle }}</span>
           </div>
           <sc-if value="{{ equityHasRows }}" hint-placeholder-val="{{ true }}">
           <div>
@@ -884,116 +980,164 @@ html,body{margin:0;padding:0;background:#070D18}
           </div>
           </div>
           </sc-if>
-          <sc-if value="{{ equityEmptyState }}" hint-placeholder-val="{{ false }}">
-            <div style="border:1px dashed rgba(120,150,190,0.28);border-radius:14px;padding:30px 22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px;">
-              <span style="font-size:26px;opacity:0.4;line-height:1;">∅</span>
-              <div style="font-size:13.5px;font-weight:600;color:#94A3B8;">{{ equityEmptyTitle }}</div>
-              <div style="font-size:11.5px;color:#64748B;line-height:1.6;max-width:540px;">{{ equityEmptyText }}</div>
-            </div>
-          </sc-if>
-        </section>
 
-        <!-- 10. 보상 비율·성과 지표 (공통) -->
-        <section class="lucy-sec" style="margin-bottom:32px;">
-          <div style="display:flex;align-items:center;gap:10px;margin:0 0 16px;flex-wrap:wrap;">
-            <h2 style="margin:0;font-size:17px;font-weight:700;color:#F1F5F9;">{{ ratioTitle }}</h2>
-            <span style="font-size:10.5px;font-weight:600;color:#93C5FD;padding:3px 9px;border-radius:6px;background:rgba(59,130,246,0.12);border:1px solid rgba(96,165,250,0.30);">{{ marketBadgeLabel }}</span>
-          </div>
-          <sc-if value="{{ ratioOrPvp }}" hint-placeholder-val="{{ true }}">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;" class="ratio-2col">
-            <div class="ratio-card" style="background:linear-gradient(135deg,#10233F,#0B1424);border:1px solid rgba(96,165,250,0.30);border-radius:16px;padding:22px 24px;min-height:320px;display:flex;flex-direction:column;">
-              <div style="font-size:11px;font-weight:600;letter-spacing:0.06em;color:#93C5FD;margin-bottom:6px;">CEO 보수비율 (Pay Ratio)</div>
-              <sc-if value="{{ ratioAvailable }}" hint-placeholder-val="{{ false }}">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;">
-              <div style="position:relative;width:190px;height:190px;">
-                <svg viewBox="0 0 {{ ratioGauge.size }} {{ ratioGauge.size }}" style="width:190px;height:190px;transform:rotate(-90deg);">
-                  <circle cx="{{ ratioGauge.cx }}" cy="{{ ratioGauge.cy }}" r="{{ ratioGauge.r }}" fill="none" stroke="#0E1B30" stroke-width="{{ ratioGauge.stroke }}"></circle>
-                  <circle cx="{{ ratioGauge.cx }}" cy="{{ ratioGauge.cy }}" r="{{ ratioGauge.r }}" fill="none" stroke="{{ ratioGauge.color }}" stroke-width="{{ ratioGauge.stroke }}" stroke-dasharray="{{ ratioGauge.dash }}" stroke-linecap="round"></circle>
-                </svg>
-                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-                  <span style="font-size:38px;font-weight:700;color:#F1F5F9;line-height:1;">{{ payRatioDisp }}</span>
-                  <span style="font-size:11px;color:#64748B;margin-top:6px;">CEO : 직원 중위</span>
-                </div>
-              </div>
-              <div style="font-size:11.5px;color:#64748B;line-height:1.6;">{{ payRatioSub }}</div>
-              </div>
-              </sc-if>
-              <sc-if value="{{ ratioCardEmpty }}" hint-placeholder-val="{{ true }}">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;">
-                <span style="font-size:22px;opacity:0.45;line-height:1;">∅</span>
-                <div style="font-size:12.5px;font-weight:600;color:#94A3B8;">{{ ratioNullTitle }}</div>
-                <div style="font-size:11.5px;color:#64748B;line-height:1.55;max-width:260px;">{{ ratioNullText }}</div>
-              </div>
-              </sc-if>
+          <!-- US: 인센티브/주식보상 = 금액(Stock·Option Awards, SCT 기준) — KR 수량과 단위·의미 분리 -->
+          <sc-if value="{{ usEquityShow }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:14px;padding:15px 18px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+              <div style="font-size:12px;color:#94A3B8;">보상 유형 요약 · NEO Equity (Stock · Option Awards)</div>
+              <div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:11px;color:#64748B;">NEO 주식·옵션 합계</span><span style="font-size:20px;font-weight:700;color:#F1F5F9;">{{ usEquityTotalDisp }}</span></div>
             </div>
-            <div class="ratio-card pvp-card-mb" style="background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:18px 20px;min-height:320px;display:flex;flex-direction:column;">
-              <div class="pvp-head" style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
-                <span style="font-size:13px;font-weight:600;color:#DCE6F5;">보상-성과 비교 (Pay Versus Performance)</span>
-                <sc-if value="{{ pvpAvailable }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;gap:12px;">
-                  <div style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#2DD4BF;"></span><span style="font-size:11px;color:#94A3B8;">실지급(CAP)</span></div>
-                  <div style="display:flex;align-items:center;gap:6px;"><span style="width:14px;height:3px;border-radius:2px;background:#60A5FA;"></span><span style="font-size:11px;color:#94A3B8;">CEO 보수(SCT)</span></div>
-                </div>
-                </sc-if>
-              </div>
-              <sc-if value="{{ pvpAvailable }}" hint-placeholder-val="{{ false }}">
-              <div class="pvp-insight" style="display:flex;align-items:center;gap:7px;margin-bottom:10px;padding:7px 11px;border-radius:8px;background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.22);">
-                <span style="font-size:10px;font-weight:700;color:#2DD4BF;">INSIGHT</span>
-                <span style="font-size:11.5px;color:#CBD5E1;">{{ pvpInsight }}</span>
-              </div>
-              <!-- line + column combo (uniform scaling — 정원형 포인트) -->
-              <svg class="pvp-chart" viewBox="0 0 {{ pvpCombo.W }} {{ pvpCombo.H }}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block;margin-bottom:10px;">
-                <sc-for list="{{ pvpCombo.cols }}" as="c" hint-placeholder-count="5">
-                  <rect x="{{ c.x }}" y="{{ c.y }}" width="{{ c.w }}" height="{{ c.h }}" rx="3" fill="#2DD4BF" opacity="0.5"></rect>
-                </sc-for>
-                <polyline points="{{ pvpCombo.linePts }}" fill="none" stroke="#60A5FA" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></polyline>
-                <sc-for list="{{ pvpCombo.dots }}" as="d" hint-placeholder-count="5">
-                  <circle cx="{{ d.cx }}" cy="{{ d.cy }}" r="4" fill="#0E1726" stroke="#60A5FA" stroke-width="2.5"></circle>
-                </sc-for>
-                <sc-for list="{{ pvpCombo.labels }}" as="l" hint-placeholder-count="5">
-                  <text x="{{ l.x }}" y="{{ l.y }}" fill="#5C6B85" font-size="15" text-anchor="middle" font-family="Inter, sans-serif">'{{ l.t }}</text>
-                </sc-for>
-              </svg>
-              <div class="pvp-tablewrap" style="overflow-x:auto;">
-                <table style="width:100%;border-collapse:collapse;min-width:440px;">
-                  <thead><tr style="color:#64748B;">
-                    <th style="text-align:left;font-size:10.5px;padding:6px 10px 8px;">회계연도</th>
-                    <th style="text-align:right;font-size:10.5px;padding:6px 10px 8px;">CEO 보수(SCT)</th>
-                    <th style="text-align:right;font-size:10.5px;padding:6px 10px 8px;">실지급 보수(CAP)</th>
-                    <th style="text-align:right;font-size:10.5px;padding:6px 10px 8px;">주주수익(TSR)</th>
-                    <th style="text-align:right;font-size:10.5px;padding:6px 10px 8px;">순이익</th>
+            <div class="desk-only" style="background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:16px;overflow:hidden;">
+              <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;min-width:560px;">
+                  <thead><tr style="background:#0E1726;">
+                    <th style="text-align:left;font-size:11px;font-weight:600;color:#64748B;padding:13px 16px;border-bottom:1px solid rgba(120,150,190,0.16);">NEO</th>
+                    <th style="text-align:right;font-size:11px;font-weight:600;color:#64748B;padding:13px 16px;border-bottom:1px solid rgba(120,150,190,0.16);">Stock Awards</th>
+                    <th style="text-align:right;font-size:11px;font-weight:600;color:#64748B;padding:13px 16px;border-bottom:1px solid rgba(120,150,190,0.16);">Option Awards</th>
+                    <th style="text-align:right;font-size:11px;font-weight:600;color:#64748B;padding:13px 16px;border-bottom:1px solid rgba(120,150,190,0.16);">주식·옵션 합계</th>
                   </tr></thead>
                   <tbody>
-                    <sc-for list="{{ payVsPerf }}" as="y" hint-placeholder-count="5">
-                      <tr style="border-top:1px solid rgba(120,150,190,0.10);">
-                        <td style="padding:6px 10px;font-size:12px;color:#DCE6F5;">{{ y.year }}</td>
-                        <td style="padding:6px 10px;text-align:right;font-size:12px;color:#94A3B8;">{{ y.sct }}</td>
-                        <td style="padding:6px 10px;text-align:right;font-size:12px;color:#DCE6F5;">{{ y.cap }}</td>
-                        <td style="padding:6px 10px;text-align:right;font-size:12px;color:#60A5FA;">{{ y.tsr }}</td>
-                        <td style="padding:6px 10px;text-align:right;font-size:12px;color:#94A3B8;">{{ y.ni }}</td>
+                    <sc-for list="{{ usEquityRows }}" as="q" hint-placeholder-count="3">
+                      <tr style="border-bottom:1px solid rgba(120,150,190,0.10);">
+                        <td style="padding:13px 16px;font-size:13px;font-weight:600;color:#F1F5F9;">{{ q.name }}<div style="font-size:10.5px;color:#64748B;font-weight:400;margin-top:2px;">{{ q.position }}</div></td>
+                        <td style="padding:13px 16px;text-align:right;font-size:13px;color:#DCE6F5;">{{ q.stock }}</td>
+                        <td style="padding:13px 16px;text-align:right;font-size:13px;color:#DCE6F5;">{{ q.option }}</td>
+                        <td style="padding:13px 16px;text-align:right;font-size:13px;font-weight:700;color:#60A5FA;">{{ q.sub }}</td>
                       </tr>
                     </sc-for>
                   </tbody>
                 </table>
               </div>
-              </sc-if>
-              <sc-if value="{{ pvpCardEmpty }}" hint-placeholder-val="{{ true }}">
-              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;">
-                <span style="font-size:22px;opacity:0.45;line-height:1;">∅</span>
-                <div style="font-size:12.5px;font-weight:600;color:#94A3B8;">{{ pvpNullTitle }}</div>
-                <div style="font-size:11.5px;color:#64748B;line-height:1.55;max-width:300px;">{{ pvpNullText }}</div>
-              </div>
-              </sc-if>
             </div>
-          </div>
+            <div class="mob-only" style="display:flex;flex-direction:column;gap:10px;">
+              <sc-for list="{{ usEquityRows }}" as="q" hint-placeholder-count="3">
+                <div style="background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:14px;padding:14px 16px;">
+                  <div style="font-size:13.5px;font-weight:600;color:#F1F5F9;margin-bottom:8px;">{{ q.name }}</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11.5px;">
+                    <div style="color:#64748B;">Stock <span style="color:#DCE6F5;">{{ q.stock }}</span></div>
+                    <div style="color:#64748B;">Option <span style="color:#DCE6F5;">{{ q.option }}</span></div>
+                    <div style="color:#64748B;">합계 <span style="color:#60A5FA;">{{ q.sub }}</span></div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="font-size:10.5px;color:#5C6B85;line-height:1.55;margin-top:10px;">※ US Equity는 SCT 기준 금액(USD)이며, KR 주식매수선택권 수량(주)과 단위·의미가 다릅니다. 개인별 부여 수량·행사가는 원문 Outstanding Equity Awards 표 기준입니다.</div>
           </sc-if>
-          <sc-if value="{{ ratioBothEmpty }}" hint-placeholder-val="{{ false }}">
-            <div style="display:flex;align-items:flex-start;gap:13px;border:1px dashed rgba(120,150,190,0.28);border-radius:12px;padding:16px 20px;">
-              <span style="font-size:20px;opacity:0.45;flex:none;line-height:1.2;">∅</span>
-              <div>
-                <div style="font-size:12.5px;font-weight:600;color:#94A3B8;">{{ ratioBothEmptyTitle }}</div>
-                <div style="font-size:11.5px;color:#64748B;line-height:1.55;margin-top:2px;">{{ ratioBothEmptyText }}</div>
+
+          <sc-if value="{{ equityEmptyState }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:flex-start;gap:9px;padding:12px 15px;background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:10px;">
+              <span style="flex:none;font-size:13px;opacity:0.5;line-height:1.4;">∅</span>
+              <span style="font-size:11.5px;color:#94A3B8;line-height:1.55;">{{ equityEmptyText }}</span>
+            </div>
+          </sc-if>
+        </section>
+
+        <!-- 10A. CEO–직원 보수배율 (US Pay Ratio) -->
+        <section class="lucy-sec" style="margin-bottom:32px;">
+          <div style="display:flex;align-items:center;gap:10px;margin:0 0 6px;flex-wrap:wrap;">
+            <h2 style="margin:0;font-size:17px;font-weight:700;color:#F1F5F9;">CEO–직원 보수배율</h2>
+          </div>
+          <div style="font-size:11.5px;color:#64748B;margin:0 0 14px;">CEO 총보수(SCT) · 직원 중위보수(Median) · 보수배율(Pay Ratio)을 분리 표시 · SEC Item 402(u)</div>
+          <sc-if value="{{ ratioAvailable }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:12px;align-items:stretch;" class="equity-3col">
+              <!-- 보수배율 강조 KPI -->
+              <div style="background:linear-gradient(135deg,#12294A,#0B1424);border:1px solid rgba(96,165,250,0.32);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;gap:11px;">
+                <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:#93C5FD;">CEO–직원 보수배율</span>
+                <div style="display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;">
+                  <span style="font-size:40px;font-weight:700;color:#F1F5F9;line-height:0.95;">{{ payRatioDisp }}</span>
+                  <span style="font-size:11.5px;color:#64748B;">CEO : 직원 중위</span>
+                </div>
+                <div style="height:6px;border-radius:3px;background:#0E1B30;overflow:hidden;"><div style="height:100%;border-radius:3px;background:#60A5FA;width:{{ ratioBarWidth }};"></div></div>
               </div>
+              <!-- CEO 총보수 -->
+              <div style="background:#111B2E;border:1px solid rgba(120,150,190,0.16);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;gap:8px;">
+                <span style="font-size:11.5px;color:#94A3B8;">CEO 총보수 <span style="color:#5C6B85;">(SCT)</span></span>
+                <span style="font-size:23px;font-weight:700;color:#F1F5F9;line-height:1;white-space:nowrap;">{{ payRatioCeoTotal }}</span>
+              </div>
+              <!-- 직원 중위보수 -->
+              <div style="background:#111B2E;border:1px solid rgba(120,150,190,0.16);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;gap:8px;">
+                <span style="font-size:11.5px;color:#94A3B8;">직원 중위보수 <span style="color:#5C6B85;">(Median)</span></span>
+                <span style="font-size:23px;font-weight:700;color:#F1F5F9;line-height:1;white-space:nowrap;">{{ payRatioMedianDisp }}</span>
+              </div>
+            </div>
+            <div style="font-size:10.5px;color:#5C6B85;line-height:1.5;margin-top:11px;">{{ ratioSctCaveat }}</div>
+          </sc-if>
+          <sc-if value="{{ ratioCardEmpty }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:flex-start;gap:9px;padding:12px 15px;background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:10px;">
+              <span style="flex:none;font-size:13px;opacity:0.5;line-height:1.4;">∅</span>
+              <span style="font-size:11.5px;color:#94A3B8;line-height:1.55;">{{ ratioNullText2 }}</span>
+            </div>
+          </sc-if>
+        </section>
+
+        <!-- 10B. 보상-성과 지표 (US PvP · SCT vs CAP) -->
+        <section class="lucy-sec" style="margin-bottom:32px;">
+          <div style="display:flex;align-items:center;gap:10px;margin:0 0 6px;flex-wrap:wrap;">
+            <h2 style="margin:0;font-size:17px;font-weight:700;color:#F1F5F9;">보상-성과 지표</h2>
+          </div>
+          <div style="font-size:11.5px;color:#64748B;margin:0 0 14px;">{{ pvpBasisLabel }}</div>
+          <sc-if value="{{ pvpVerifyNote }}" hint-placeholder-val="{{ false }}">
+            <div style="margin:0 0 12px;display:flex;align-items:flex-start;gap:8px;padding:9px 13px;background:rgba(245,158,11,0.07);border:1px solid rgba(245,158,11,0.26);border-radius:9px;font-size:11px;color:#CBB279;line-height:1.5;"><span style="flex:none;color:#FBBF24;">⚠</span><span>{{ pvpVerifyNote }}</span></div>
+          </sc-if>
+          <sc-if value="{{ pvpAvailable }}" hint-placeholder-val="{{ false }}">
+            <div class="ratio-2col pvp-card-mb" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch;background:#111B2E;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:16px 18px;">
+              <!-- 좌: compact 추세 요약 차트 (저강조) -->
+              <div style="display:flex;flex-direction:column;min-width:0;border-right:1px solid rgba(120,150,190,0.12);padding-right:16px;" class="pvp-mini-left">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
+                  <span style="font-size:11px;font-weight:600;color:#8190A8;">SCT · CAP 추세 요약</span>
+                  <div style="display:flex;gap:9px;">
+                    <div style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#7CC4FF;"></span><span style="font-size:10px;color:#94A3B8;">SCT</span></div>
+                    <div style="display:flex;align-items:center;gap:5px;"><span style="width:8px;height:8px;border-radius:2px;background:#5EE6C8;"></span><span style="font-size:10px;color:#94A3B8;">CAP</span></div>
+                  </div>
+                </div>
+                <div style="flex:1;display:flex;align-items:center;min-height:96px;">
+                  <svg viewBox="0 0 {{ pvpMini.W }} {{ pvpMini.H }}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;display:block;">
+                    <line x1="{{ pvpMini.padX }}" y1="{{ pvpMini.zeroY }}" x2="{{ pvpMini.plotW }}" y2="{{ pvpMini.zeroY }}" stroke="rgba(120,150,190,0.22)" stroke-width="1"></line>
+                    <sc-for list="{{ pvpMini.bars }}" as="b" hint-placeholder-count="10">
+                      <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" rx="1.5" fill="{{ b.color }}" opacity="0.72"></rect>
+                    </sc-for>
+                    <sc-for list="{{ pvpMini.labels }}" as="l" hint-placeholder-count="5">
+                      <text x="{{ l.x }}" y="{{ l.y }}" fill="#5C6B85" font-size="11" text-anchor="middle" font-family="Inter, sans-serif">'{{ l.t }}</text>
+                    </sc-for>
+                  </svg>
+                </div>
+                <div style="font-size:10px;color:#5C6B85;line-height:1.45;margin-top:6px;">추세 확인용 요약 · 상세값은 우측 표 참조</div>
+                <sc-if value="{{ pvpInsight }}" hint-placeholder-val="{{ false }}">
+                  <div style="margin-top:8px;display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:8px;background:rgba(45,212,191,0.08);border:1px solid rgba(45,212,191,0.22);"><span style="flex:none;font-size:9.5px;font-weight:700;color:#2DD4BF;">기준 비교</span><span style="font-size:11px;color:#CBD5E1;line-height:1.45;">{{ pvpInsight }}</span></div>
+                </sc-if>
+              </div>
+              <!-- 우: 5개년 compact 비교표 -->
+              <div style="min-width:0;display:flex;flex-direction:column;justify-content:center;" class="pvp-mini-right">
+                <div class="pvp-tablewrap" style="overflow-x:auto;">
+                  <table style="width:100%;border-collapse:collapse;">
+                    <thead><tr style="color:#64748B;">
+                      <th style="text-align:left;font-size:10.5px;padding:7px 8px 10px;">회계연도</th>
+                      <th style="text-align:right;font-size:10.5px;padding:7px 8px 10px;">명목 보수(SCT)</th>
+                      <th style="text-align:right;font-size:10.5px;padding:7px 8px 10px;">실지급 보수(CAP)</th>
+                      <sc-if value="{{ pvpHasPerf }}" hint-placeholder-val="{{ false }}"><th style="text-align:right;font-size:10.5px;padding:7px 8px 10px;">주주수익(TSR)</th></sc-if>
+                      <sc-if value="{{ pvpHasPerf }}" hint-placeholder-val="{{ false }}"><th style="text-align:right;font-size:10.5px;padding:7px 8px 10px;">순이익</th></sc-if>
+                    </tr></thead>
+                    <tbody>
+                      <sc-for list="{{ payVsPerf }}" as="y" hint-placeholder-count="5">
+                        <tr style="border-top:1px solid rgba(120,150,190,0.10);">
+                          <td style="padding:10px 8px;font-size:12px;color:#DCE6F5;">{{ y.year }}</td>
+                          <td style="padding:10px 8px;text-align:right;font-size:12px;color:#94A3B8;">{{ y.sct }}</td>
+                          <td style="padding:10px 8px;text-align:right;font-size:12px;color:#DCE6F5;">{{ y.cap }}</td>
+                          <sc-if value="{{ pvpHasPerf }}" hint-placeholder-val="{{ false }}"><td style="padding:10px 8px;text-align:right;font-size:12px;color:#60A5FA;">{{ y.tsr }}</td></sc-if>
+                          <sc-if value="{{ pvpHasPerf }}" hint-placeholder-val="{{ false }}"><td style="padding:10px 8px;text-align:right;font-size:12px;color:#94A3B8;">{{ y.ni }}</td></sc-if>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </div>
+                <sc-if value="{{ pvpNoPerf }}" hint-placeholder-val="{{ false }}"><div style="font-size:10px;color:#5C6B85;line-height:1.5;margin-top:10px;">주주수익(TSR)·순이익은 현재 연결된 원문 데이터에 없어 표시하지 않습니다.</div></sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ pvpCardEmpty }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:flex-start;gap:9px;padding:12px 15px;background:#0E1726;border:1px solid rgba(120,150,190,0.16);border-radius:10px;">
+              <span style="flex:none;font-size:13px;opacity:0.5;line-height:1.4;">∅</span>
+              <span style="font-size:11.5px;color:#94A3B8;line-height:1.55;">{{ pvpNullText2 }}</span>
             </div>
           </sc-if>
         </section>
@@ -1054,7 +1198,7 @@ html,body{margin:0;padding:0;background:#070D18}
             <div style="display:flex;flex-direction:column;gap:11px;font-size:11.5px;color:#8190A8;line-height:1.55;">
               <div><span style="color:#F1F5F9;font-weight:600;">KR DART 21개사</span><br>임원·직원·보수·주식보상·개인별 보수·원문 표 검증 완료. 기본 화면 summary rows ↔ 원문 표 모달 sourceTables rows 분리. 단시간 근로자 중복 합산 금지·미등기임원 기준 분리·기타비상무 분리 유지.</div>
               <div><span style="color:#F1F5F9;font-weight:600;">US DEF 14A SCT/NEO 13개사</span><br>최신 회계연도 SCT/NEO 반영. 개인별 보수 상세 + Summary Compensation Table 원문 표 모달 연결. CEO total 검산 notes 유지. Micron·3M·Boeing은 검산 PASS분에 한해 다년치 allRows 반영.</div>
-              <div><span style="color:#F1F5F9;font-weight:600;">US DEF 14A PvP 중심 10개사</span><br>DEF 14A 원문·파싱표 기반. SCT 행 검산 PASS 9개사(Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·Johnson & Johnson·Amazon)는 개인별 보수 상세(최신 회계연도) + Summary Compensation Table 원문 표 모달(다년치) 연결 완료. 나머지 1개사(Tesla)는 SCT 표 식별/행 검산 미통과로 미연결 — PvP·CEO Pay Ratio 중심 표시 유지(원문 존재, 연결 대기). Director Compensation/officers 전체 명단은 추가 검산 대상. Pay Ratio/CAP/PvP를 SCT 개인별 보수로 둔갑시키지 않음.</div>
+              <div><span style="color:#F1F5F9;font-weight:600;">US DEF 14A PvP 중심 10개사</span><br>DEF 14A 원문·파싱표 기반. SCT 행 검산 PASS **10개사 전부**(Apple·Microsoft·Alphabet·NVIDIA·JPMorgan·Walmart·Meta·Johnson & Johnson·Amazon·Tesla)는 개인별 보수 상세(최신 회계연도) + Summary Compensation Table 원문 표 모달(다년치) 연결 완료. Tesla는 CEO Elon Musk의 SCT 보수가 원문상 전액 미수령("—")이라 원문 그대로 표시(2018/2025 CEO Performance Award는 SCT 외 항목으로 미포함). Director Compensation/officers 전체 명단은 추가 검산 대상. Pay Ratio/CAP/PvP를 SCT 개인별 보수로 둔갑시키지 않음.</div>
             </div>
           </div>
         </div>
@@ -1063,12 +1207,9 @@ html,body{margin:0;padding:0;background:#070D18}
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:20px;">
           <div style="background:#0E1726;border:1px solid rgba(245,158,11,0.30);border-radius:16px;padding:18px 20px;">
             <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#FBBF24;margin-bottom:10px;">사용자 화면 노출 금지 문구</div>
-            <p style="margin:0 0 10px;font-size:11.5px;color:#8190A8;line-height:1.6;">사용자 화면에는 파싱·내부 QA·미완료 상태를 직접 노출하지 않는다. null-state 제목은 아래 2개만 사용:</p>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-              <span style="font-size:11px;font-weight:600;color:#4ADE80;padding:3px 9px;border-radius:6px;background:rgba(34,197,94,0.10);border:1px solid rgba(34,197,94,0.30);">해당사항 없음</span>
-              <span style="font-size:11px;font-weight:600;color:#4ADE80;padding:3px 9px;border-radius:6px;background:rgba(34,197,94,0.10);border:1px solid rgba(34,197,94,0.30);">현재 확인할 수 없습니다</span>
-            </div>
-            <div style="font-size:11px;color:#7C8AA3;line-height:1.7;overflow-wrap:anywhere;">금지: 추가 추출 대상 · 추가 파싱 필요 · 파싱 필요 · 미완료 · needs_review · requires_parsing · not_in_filing · pvpStatus · XBRL · Text Parsing · ecd tag · 데이터가 아직 연결되지 않았습니다 · 안정적으로 연결되지 않았습니다 · undefined · NaN · 원문 미기재 · 미제공 · 데이터 없음 · 표준 블록 미확인 · 구조화 데이터 미제공</div>
+            <p style="margin:0 0 10px;font-size:11.5px;color:#8190A8;line-height:1.6;">empty-state는 타이틀 없이 문장형 본문만, compact 좌측정렬 row로 표시. 내부 상태값(11종)→사용자 문구 매핑:</p>
+            <div style="font-size:11px;color:#A9B7CE;line-height:1.8;overflow-wrap:anywhere;margin-bottom:10px;">not_in_form → 해당 문서에서는 제공되지 않습니다. (공시 기준 차이)<br>not_provided → 원문에서 해당 항목을 확인할 수 없습니다.<br>unconnected → 현재 연결된 데이터가 없습니다.<br>needs_structuring → 원문 표 정형화가 필요합니다.<br>not_applicable / connected_zero → 원문 기준 해당 보수 지급 내역이 없습니다.<br>unverified → 원문 기준 확인이 필요합니다. · check → 원문 구조상 추가 확인이 필요합니다.<br>policyOnly → 보수 정책만 제공됩니다. · partial → 일부 항목만 연결되었습니다.</div>
+            <div style="font-size:11px;color:#7C8AA3;line-height:1.7;overflow-wrap:anywhere;">금지(화면 0건): 해당사항 없음 · 없음(어미) · 확인 불가 · 현재 확인할 수 없습니다 · 데이터 없음 · 추가 추출 필요 · 미제공 · 원문 미기재 · 미완료 · needs_review · requires_parsing · undefined · NaN. KR/US 같은 상태값은 동일 문구.</div>
           </div>
           <div style="background:#0E1726;border:1px solid rgba(120,150,190,0.18);border-radius:16px;padding:18px 20px;">
             <div style="font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#93C5FD;margin-bottom:10px;">Release 구조 (다중 파일)</div>
@@ -1316,7 +1457,7 @@ class Component extends DCLogic {
         {label:'직원 수',value:'72,598',unit:'명',sub:'정규 63,854·기간제 8,744·단시간 16',color:'#F1F5F9'},
         {label:'총보수',value:'23,692',unit:'백만원',sub:'이사·감사 12명 (퇴임위로금 3,638 별도)',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'131',unit:'백만원',sub:'직원 1인 평균급여',color:'#F1F5F9'},
-        {label:'주식보상',value:'해당없음',unit:'',sub:'주식매수선택권 미부여',color:'#94A3B8'},
+        {label:'주식보상',value:'미부여',unit:'',sub:'주식매수선택권 부여 내역이 없습니다',color:'#94A3B8'},
       ],
       officersCaption:'성명·직위·구분·주요경력·주식보유·재직/선임',
       officers,
@@ -1475,7 +1616,7 @@ class Component extends DCLogic {
         {field:'기준일',text:'2025.12.31 현재',src:'사업보고서 본문'},
         {field:'직원 현황 기준',text:'직원 수에 미등기임원 33명 포함, 연간급여총액은 기준일 현재 재직 직원 기준',src:'직원 등 현황 주석'},
         {field:'임원 변동',text:'2025.03 정기주총에서 사내이사 오상훈·송종국, 사외이사 김희진·전태준 임기만료 사임 / 사내이사 차원태, 사외이사 이상균 신규선임',src:'임원 변동 주석'},
-        {field:'개인별 보수',text:'이사·감사 및 임직원 중 개인별 5억원 이상 대상자 없음 (해당사항 없음)',src:'개인별 보수지급금액'},
+        {field:'개인별 보수',text:'이사·감사 및 임직원 중 개인별 5억원 이상 대상자가 없습니다.',src:'개인별 보수지급금액'},
         {field:'주식매수선택권',text:'당기 부여 업무집행지시자 등 3명에 공정가치 33,090천원 (이항모형) — 부여수량·행사가격 등 상세는 추가 확인 대상',src:'주식매수선택권 부여 및 행사현황'},
       ],
     };
@@ -1507,11 +1648,11 @@ class Component extends DCLogic {
       brief:'위탁관리 부동산투자회사(REIT)로, 자산관리는 신한리츠운용㈜(AMC)에 위탁하여 운영됩니다. 자체 고용 직원은 없으며, 이사 7명·감사 1명에 대한 보수 한도(이사 9·감사 6백만원)와 실제 지급액(8명 15백만원)이 공시되었습니다. 이사 전원 비상근 구조입니다.',
       kpis:[
         {label:'이사 · 임원 수',value:'8',unit:'명',sub:'사내 1·기타비상무 6·감사 1 (전원 비상근)',color:'#F1F5F9'},
-        {label:'주요 경영진',value:'해당없음',unit:'',sub:'미등기임원 없음',color:'#94A3B8'},
-        {label:'직원 수',value:'해당없음',unit:'',sub:'자체 직원 없음 (AMC 위탁)',color:'#94A3B8'},
+        {label:'주요 경영진',value:'—',unit:'',sub:'미등기임원이 없습니다',color:'#94A3B8'},
+        {label:'직원 수',value:'—',unit:'',sub:'자체 고용 직원이 없습니다 (AMC 위탁)',color:'#94A3B8'},
         {label:'총보수',value:'15',unit:'백만원',sub:'이사·감사 8명 실지급',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'2',unit:'백만원',sub:'이사·감사 1인 평균',color:'#F1F5F9'},
-        {label:'주식보상',value:'해당없음',unit:'',sub:'주식매수선택권 미부여',color:'#94A3B8'},
+        {label:'주식보상',value:'미부여',unit:'',sub:'주식매수선택권 부여 내역이 없습니다',color:'#94A3B8'},
       ],
       officersCaption:'성명·직위·구분·주요경력·주식보유·재직/선임',
       officers,
@@ -1521,15 +1662,15 @@ class Component extends DCLogic {
         {label:'감사',count:1,color:'#F59E0B'},
       ],
       employeesAvailable:false, employeesEmpty:true, employees:[],
-      employeesEmptyText:'위탁관리 부동산투자회사(REIT)로 자산관리를 신한리츠운용㈜(AMC)에 위탁하며, 자체 고용 직원이 없습니다 (직원 등 현황 전 항목 해당사항 없음).',
+      employeesEmptyText:'위탁관리 부동산투자회사(REIT)로 자산관리를 신한리츠운용㈜(AMC)에 위탁하며, 자체 고용 직원이 없습니다 (직원 등 현황 전 항목 미해당).',
       compensationContextFlag:'reit_small_board_compensation',
       workLifeAvailable:false, workLifeSummary:'', workLife:[],
       compSummaryBadge:'DART · 미등기임원',
       comp47Empty:true,
       comp47Cards:[
-        {label:'인원수',value:'해당없음',unit:'',sub:'미등기임원 없음'},
-        {label:'연간급여 총액',value:'—',unit:'',sub:'해당사항 없음'},
-        {label:'1인 평균급여',value:'—',unit:'',sub:'해당사항 없음'},
+        {label:'인원수',value:'—',unit:'',sub:'미등기임원이 없습니다'},
+        {label:'연간급여 총액',value:'—',unit:'',sub:'원문 기준 해당 내역이 없습니다'},
+        {label:'1인 평균급여',value:'—',unit:'',sub:'원문 기준 해당 내역이 없습니다'},
       ],
       dirBadge:'DART · 이사/감사',
       dirLimit:{available:true, note:'위탁관리 REIT로 이사 전원 비상근이며 보수 규모가 소액입니다.', rows:[
@@ -1557,10 +1698,10 @@ class Component extends DCLogic {
       deferred:{ available:false, emptyText:'KR 사업보고서에는 Pension·Deferred·Termination 등 별도 퇴직·이연·연금 보상 표가 별도 항목으로 제공되지 않습니다.', rows:[] },
       notes:[
         {field:'회사 구조',text:'부동산투자회사법에 근거한 위탁관리 부동산투자회사(REIT). 자산관리회사(AMC)는 신한리츠운용㈜, 자산보관 국민은행, 일반사무 신한아이타스㈜에 위탁',src:'회사의 개요'},
-        {field:'직원 등 현황',text:'자체 고용 직원 없음 — 직원 수·급여 전 항목 해당사항 없음',src:'직원 등 현황'},
-        {field:'미등기임원',text:'미등기임원 없음 (해당사항 없음)',src:'미등기임원 보수 현황'},
+        {field:'직원 등 현황',text:'자체 고용 직원이 없어 직원 수·급여 전 항목이 제공되지 않습니다.',src:'직원 등 현황'},
+        {field:'미등기임원',text:'미등기임원이 없습니다.',src:'미등기임원 보수 현황'},
         {field:'단위',text:'금액 백만원, 인원 명 기준 · 기준일 2026.03.31 (반기 결산)',src:'DART 표 머리글'},
-        {field:'주식매수선택권',text:'당기 부여·행사 내역 없음 (해당사항 없음)',src:'주식매수선택권 부여 및 행사현황'},
+        {field:'주식매수선택권',text:'당기 주식매수선택권 부여·행사 내역이 없습니다.',src:'주식매수선택권 부여 및 행사현황'},
       ],
     };
   }
@@ -1601,7 +1742,7 @@ class Component extends DCLogic {
         {label:'직원 수',value:'436',unit:'명',sub:'정규 426·기간제 10',color:'#F1F5F9'},
         {label:'총보수',value:'437',unit:'백만원',sub:'이사·감사 8명 실지급',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'66',unit:'백만원',sub:'직원 1인 평균급여',color:'#F1F5F9'},
-        {label:'주식보상',value:'해당없음',unit:'',sub:'주식매수선택권 부여 사실 없음',color:'#94A3B8'},
+        {label:'주식보상',value:'미부여',unit:'',sub:'주식매수선택권 부여 사실이 없습니다',color:'#94A3B8'},
       ],
       officersCaption:'성명·직위·구분·주요경력·주식보유·재직/선임',
       officers,
@@ -1660,7 +1801,7 @@ class Component extends DCLogic {
         {field:'기준일',text:'2025.12.31 현재',src:'사업보고서 본문'},
         {field:'이사 보수한도',text:'2025.07.30 임시주총에서 이사 보수총액 한도 30억원으로 상향',src:'주주총회 승인금액 주석'},
         {field:'주식매수선택권',text:'공시작성 기준일 현재 주식매수선택권을 부여한 사실이 없음 (원문 명시)',src:'주식매수선택권 부여 및 행사현황'},
-        {field:'개인별 보수',text:'5억원 이상 대상자 없음 (해당사항 없음)',src:'개인별 보수지급금액'},
+        {field:'개인별 보수',text:'5억원 이상 개인별 보수 대상자가 없습니다.',src:'개인별 보수지급금액'},
       ],
     };
   }
@@ -1698,7 +1839,7 @@ class Component extends DCLogic {
         {label:'직원 수',value:'257',unit:'명',sub:'정규 254·기간제 3',color:'#F1F5F9'},
         {label:'총보수',value:'972',unit:'백만원',sub:'이사·감사 8명 실지급',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'93',unit:'백만원',sub:'직원 1인 평균급여',color:'#F1F5F9'},
-        {label:'주식보상',value:'해당없음',unit:'',sub:'주식매수선택권 부여 사실 없음',color:'#94A3B8'},
+        {label:'주식보상',value:'미부여',unit:'',sub:'주식매수선택권 부여 사실이 없습니다',color:'#94A3B8'},
       ],
       officersCaption:'성명·직위·구분·주요경력·주식보유·재직/선임',
       officers,
@@ -1791,7 +1932,7 @@ class Component extends DCLogic {
         {label:'직원 수',value:'56',unit:'명',sub:'전사',color:'#F1F5F9'},
         {label:'총보수',value:'765',unit:'백만원',sub:'이사·감사 6명 실지급',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'—',unit:'',sub:'직원 1인 평균급여',color:'#94A3B8'},
-        {label:'주식보상',value:'해당없음',unit:'',sub:'주식매수선택권 미부여',color:'#94A3B8'},
+        {label:'주식보상',value:'미부여',unit:'',sub:'주식매수선택권 부여 내역이 없습니다',color:'#94A3B8'},
       ],
       officersCaption:'성명·직위·구분·주요경력·주식보유·재직/선임',
       officers,
@@ -1842,8 +1983,8 @@ class Component extends DCLogic {
         {field:'기준일',text:'2025.12.31 현재',src:'사업보고서 본문'},
         {field:'직원 1인평균급여',text:'원문 1인평균급여액이 월 기준(천원)으로 추정되어 연간 환산과 상이 — 합계행 미표기(—), 부문별 1인평균 비표시',src:'직원 등 현황'},
         {field:'임원 명단',text:'등기임원 8명·미등기임원 1명 반영 — 단, 미등기임원 보수 현황은 3명으로 원문 간 인원 차이 존재',src:'임원 현황 / 미등기임원 보수'},
-        {field:'개인별 보수',text:'5억원 이상 대상자 없음 (해당사항 없음)',src:'개인별 보수지급금액'},
-        {field:'주식매수선택권',text:'당기 부여·행사 내역 없음 (해당사항 없음)',src:'주식매수선택권 부여 및 행사현황'},
+        {field:'개인별 보수',text:'5억원 이상 개인별 보수 대상자가 없습니다.',src:'개인별 보수지급금액'},
+        {field:'주식매수선택권',text:'당기 주식매수선택권 부여·행사 내역이 없습니다.',src:'주식매수선택권 부여 및 행사현황'},
       ],
     };
   }
@@ -1888,7 +2029,7 @@ class Component extends DCLogic {
         {label:'직원 수',value:'301',unit:'명',sub:'정규 300(단시간 5)·기간제 1',color:'#F1F5F9'},
         {label:'총보수',value:'95',unit:'백만원',sub:'이사·감사 5명 (1분기 누적)',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'20',unit:'백만원',sub:'직원 1인 평균급여',color:'#F1F5F9'},
-        {label:'주식보상',value:'해당없음',unit:'',sub:'당기 부여·행사 없음',color:'#94A3B8'},
+        {label:'주식보상',value:'미부여',unit:'',sub:'당기 부여·행사 내역이 없습니다',color:'#94A3B8'},
       ],
       officersCaption:'성명·직위·구분·주요경력·주식보유·재직/선임',
       officers,
@@ -1939,8 +2080,8 @@ class Component extends DCLogic {
         {field:'문서유형',text:'분기보고서 — 보수는 1분기 누적 기준, 개인별 5억+ 및 일부 항목은 분기 특성상 미기재',src:'표지/분기보고서'},
         {field:'단위',text:'금액 천원 원문 → 백만원 환산 표기, 인원 명',src:'DART 표 머리글'},
         {field:'기준일',text:'2025.03.31 현재',src:'사업보고서 본문'},
-        {field:'개인별 보수',text:'5억원 이상 대상자 없음 (해당사항 없음)',src:'개인별 보수지급금액'},
-        {field:'주식매수선택권',text:'당기 부여·행사 내역 없음 (해당사항 없음)',src:'주식매수선택권 부여 및 행사현황'},
+        {field:'개인별 보수',text:'5억원 이상 개인별 보수 대상자가 없습니다.',src:'개인별 보수지급금액'},
+        {field:'주식매수선택권',text:'당기 주식매수선택권 부여·행사 내역이 없습니다.',src:'주식매수선택권 부여 및 행사현황'},
         {field:'임원 명단',text:'등기임원 5명·미등기임원 13명 전원 반영',src:'임원 현황'},
       ],
     };
@@ -2049,7 +2190,7 @@ class Component extends DCLogic {
       notes:[
         {field:'단위',text:'보수 금액은 백만원, 주식매수선택권 공정가치는 원, 인원은 명 기준',src:'DART 표 머리글'},
         {field:'기준일',text:'2025.12.31 현재',src:'사업보고서 본문'},
-        {field:'개인별 보수',text:'이사·감사 개인별 보수 5억원 미만으로 해당사항 없음',src:'개인별 보수지급금액'},
+        {field:'개인별 보수',text:'이사·감사 개인별 보수가 5억원 미만으로 대상자가 없습니다.',src:'개인별 보수지급금액'},
         {field:'주식매수선택권',text:'공정가치 총액 98,562,433원(이항모형) — 등기이사 2명 39.5백만·업무집행지시자 5명 59.0백만. 행사가격·수량은 주식병합 전 기준',src:'주식매수선택권 부여 및 행사현황'},
         {field:'임원 명단',text:'등기임원 5명·미등기임원 7명 전원 반영 (김형훈 이사 2026.02.28 퇴임)',src:'임원 현황'},
       ],
@@ -2100,7 +2241,7 @@ class Component extends DCLogic {
         {label:'직원 수',value:'155',unit:'명',sub:'전사',color:'#F1F5F9'},
         {label:'총보수',value:'743',unit:'백만원',sub:'이사·감사 5명 실지급',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'75',unit:'백만원',sub:'직원 1인 평균급여',color:'#F1F5F9'},
-        {label:'주식보상',value:'해당없음',unit:'',sub:'주식매수선택권 미부여',color:'#94A3B8'},
+        {label:'주식보상',value:'미부여',unit:'',sub:'주식매수선택권 부여 내역이 없습니다',color:'#94A3B8'},
       ],
       officersCaption:'성명·직위·구분·주요경력·주식보유·재직/선임',
       officers,
@@ -2164,8 +2305,8 @@ class Component extends DCLogic {
       notes:[
         {field:'단위',text:'금액은 천원 원문 → 백만원 환산 표기, 인원은 명 기준',src:'DART 표 머리글'},
         {field:'기준일',text:'2025.12.31 현재',src:'사업보고서 본문'},
-        {field:'개인별 보수',text:'5억원 이상 대상자 없음 (해당사항 없음)',src:'개인별 보수지급금액'},
-        {field:'주식매수선택권',text:'당기 부여·행사 내역 없음 (해당사항 없음)',src:'주식매수선택권 부여 및 행사현황'},
+        {field:'개인별 보수',text:'5억원 이상 개인별 보수 대상자가 없습니다.',src:'개인별 보수지급금액'},
+        {field:'주식매수선택권',text:'당기 주식매수선택권 부여·행사 내역이 없습니다.',src:'주식매수선택권 부여 및 행사현황'},
         {field:'직원 부문',text:'경영관리·품질안전·생산·기술연구·조달·기술·그린에너지·탱크·영업부 부문별·성별 전원 반영 (합계 155명)',src:'직원 등 현황'},
         {field:'임원 명단',text:'등기임원 5명·미등기임원 17명 전원 반영',src:'임원 현황'},
       ],
@@ -2196,7 +2337,7 @@ class Component extends DCLogic {
     let cards;
     if(D.unreg && !D.unreg.none && D.unreg.pay!=null){ cards=[{label:'인원수',value:String(D.unreg.n),unit:'명',sub:'미등기임원'},{label:'연간급여 총액',value:fmtN(D.unreg.pay),unit:'백만원',sub:'미등기임원 보수'},{label:'1인 평균급여',value:String(D.unreg.avg),unit:'백만원',sub:'연간급여÷인원'}]; }
     else if(D.board){ cards=[{label:'인원수',value:String(D.board.n),unit:'명',sub:'이사·감사 전체'},{label:'보수총액',value:fmtN(D.board.pay),unit:'백만원',sub:'실지급'},{label:'1인 평균보수',value:String(D.board.avg),unit:'백만원',sub:'보수총액÷인원'}]; }
-    else { cards=[{label:'인원수',value:'—',unit:'',sub:'해당사항 없음'},{label:'보수총액',value:'—',unit:'',sub:'해당사항 없음'},{label:'1인 평균',value:'—',unit:'',sub:'해당사항 미기재'}]; }
+    else { cards=[{label:'인원수',value:'—',unit:'',sub:'원문 기준 해당 내역이 없습니다'},{label:'보수총액',value:'—',unit:'',sub:'원문 기준 해당 내역이 없습니다'},{label:'1인 평균',value:'—',unit:'',sub:'해당사항 미기재'}]; }
     const dirLimit = (D.approv&&D.approv.length)? {available:true, rows:D.approv.map(a=>({label:a[0],sub:'인원 '+a[1]+'명 · 주주총회 승인',amount:fmtN(a[2])+' 백만원'}))} : {available:false, emptyText:'해당 문서에서는 보수 한도가 제공되지 않습니다.'};
     const dirPaidRows=[];
     if(D.board) dirPaidRows.push({label:'이사·감사 전체',sub:D.board.n+'명 · 1인평균 '+D.board.avg+'백만원',amount:fmtN(D.board.pay)+' 백만원'});
@@ -2216,7 +2357,7 @@ class Component extends DCLogic {
         {label:'이사 · 임원 수',value:String(regCount),unit:'명',sub:'등기임원 (사내·사외·감사)',color:'#F1F5F9'},
         {label:'주요 경영진',value: unregN>0?String(unregN):'해당없음',unit:unregN>0?'명':'',sub:'미등기임원',color:unregN>0?'#F1F5F9':'#94A3B8'},
         {label:'직원 수',value:fmtN(e.n),unit:'명',sub:'정규 '+fmtN(e.reg)+'·기간제 '+fmtN(e.fix),color:'#F1F5F9'},
-        {label:'총보수',value:D.board?fmtN(D.board.pay):'—',unit:D.board?'백만원':'',sub:D.board?'이사·감사 '+D.board.n+'명':'해당사항 없음',color:'#F1F5F9'},
+        {label:'총보수',value:D.board?fmtN(D.board.pay):'—',unit:D.board?'백만원':'',sub:D.board?'이사·감사 '+D.board.n+'명':'원문 기준 해당 내역이 없습니다',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:e.avg!=null?String(e.avg):'—',unit:e.avg!=null?'백만원':'',sub:'직원 1인 평균급여',color:e.avg!=null?'#F1F5F9':'#94A3B8'},
         {label:'주식보상',value:soGranted?'부여':'해당없음',unit:soGranted?'✓':'',sub:soGranted?'주식매수선택권 부여':'주식매수선택권 미부여',color:soGranted?'#4ADE80':'#94A3B8'},
       ],
@@ -2246,7 +2387,7 @@ class Component extends DCLogic {
         {field:'문서유형',text:D.form+' — 기준일 2025.12.31 · 사업연도 2025',src:'표지/사업보고서'},
         {field:'단위',text:'금액 원문(천원/백만원/원) → 백만원 환산 표기, 인원 명',src:'DART 표 머리글'},
         {field:'임원 명단',text:'임원현황 표 기준 '+(D.off||[]).length+'명 반영 (주요경력·주식보유·재직기간은 원문 표 기준)',src:'임원 현황'},
-        {field:'개인별 보수',text:over.length>0?('5억원 이상 '+over.length+'명: '+over.map(v=>v[0]+' '+fmtN(v[2])+'백만원').join(' · ')):'5억원 이상 대상자 없음 (해당사항 없음)',src:'개인별 보수지급금액'},
+        {field:'개인별 보수',text:over.length>0?('5억원 이상 '+over.length+'명: '+over.map(v=>v[0]+' '+fmtN(v[2])+'백만원').join(' · ')):'5억원 이상 개인별 보수 대상자가 없습니다.',src:'개인별 보수지급금액'},
         {field:'주식매수선택권',text:soGranted?'부여 사실 있음 (개인별 수량·공정가치는 원문 표 기준)':'당기 부여·행사 없음',src:'주식매수선택권 부여 및 행사현황'},
       ].concat(extraNotes),
     };
@@ -2298,7 +2439,7 @@ class Component extends DCLogic {
         {label:'직원 수',value:'111',unit:'명',sub:'사무·연구·생산',color:'#F1F5F9'},
         {label:'총보수',value:'953',unit:'백만원',sub:'이사·감사 4명 실지급',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'69',unit:'백만원',sub:'직원 1인 평균급여',color:'#F1F5F9'},
-        {label:'주식보상',value:'해당없음',unit:'',sub:'주식매수선택권 미부여',color:'#94A3B8'},
+        {label:'주식보상',value:'미부여',unit:'',sub:'주식매수선택권 부여 내역이 없습니다',color:'#94A3B8'},
       ],
       officersCaption:'성명·직위·구분·주요경력·주식보유·재직/선임',
       officers,
@@ -2364,7 +2505,7 @@ class Component extends DCLogic {
         {field:'기준일',text:'2024.12.31 현재',src:'사업보고서 본문'},
         {field:'1인평균급여',text:'연간급여총액 ÷ 연간 평균 직원 수로 산정',src:'직원 등 현황'},
         {field:'개인별 보수',text:'5억원 이상 대상자 1인 — 여경목 대표이사 873백만원(급여 656+상여 217)',src:'개인별 보수지급금액'},
-        {field:'주식매수선택권',text:'당기 부여·행사 내역 없음 (해당사항 없음)',src:'주식매수선택권 부여 및 행사현황'},
+        {field:'주식매수선택권',text:'당기 주식매수선택권 부여·행사 내역이 없습니다.',src:'주식매수선택권 부여 및 행사현황'},
       ],
     };
   }
@@ -2374,7 +2515,12 @@ class Component extends DCLogic {
     const fmt = (n)=>{ if(n==null||n===''||isNaN(Number(n))) return '—'; n=Number(n); const a=Math.abs(n); if(a>=1e9) return '$'+(n/1e9).toFixed(2)+'B'; return '$'+(n/1e6).toFixed(2)+'M'; };
     const R = {
       AAPL:{co:'Apple Inc.',tk:'NASDAQ · AAPL',ceo:'Tim Cook',filing:'2026.01.08',fy:'FY2025 (ended 2025.09.27)',rep:'2025.09.27',ceoTotal:74294811,neoAvg:23812358,cap:108423733,
-        s:[['2021',98734394,311845801],['2022',99420097,128833021],['2023',63209845,106643588],['2024',74609802,168980568],['2025',74294811,108423733]]},
+        s:[['2021',98734394,311845801],['2022',99420097,128833021],['2023',63209845,106643588],['2024',74609802,168980568],['2025',74294811,108423733]],
+        // 원문 대조 완료(uploads/def14a_samples/AAPL 2026 · Pay Versus Performance 표 / CEO Pay Ratio / Non-Employee Director Compensation)
+        pvpVerified:true,
+        tsrNi:{'2021':[131.69,94680],'2022':[135.59,99803],'2023':[155.24,96955],'2024':[207.59,93736],'2025':[233.88,112010]},
+        median:139483, ratio:'533:1', ratioN:533, ratioCeoComp:74294811,
+        directorComp:[['Wanda Austin',100000,310035,2815,412850],['Alex Gorsky',100000,310035,6457,416492],['Andrea Jung',140000,310035,7985,458020],['Art Levinson',275000,274956,7275,557231],['Monica Lozano',100000,310035,2921,412956],['Ron Sugar',145000,310035,16248,471283],['Sue Wagner',135000,310035,338,445373]]},
       AMZN:{co:'Amazon.com, Inc.',tk:'NASDAQ · AMZN',ceo:'Andrew R. Jassy',filing:'2026.04.09',fy:'FY2025 (ended 2025.12.31)',rep:'2025.12.31',ceoTotal:2069861,neoAvg:693697,cap:13205807,
         s:[['2021',212701169,208002373],['2022',1298723,-147737654],['2023',1357764,109566048],['2024',1596889,92371410],['2025',2069861,13205807]]},
       GOOGL:{co:'Alphabet Inc.',tk:'NASDAQ · GOOGL',ceo:'Sundar Pichai',filing:'2026.04.24',fy:'FY2025 (ended 2025.12.31)',rep:'2025.12.31',ceoTotal:10906079,neoAvg:32934710,cap:213903156,
@@ -2410,7 +2556,19 @@ class Component extends DCLogic {
     };
     const sel = this.state.usChoice || '';
     const keyFor = (s)=>{ if(s.indexOf('Apple')===0)return 'AAPL'; if(s.indexOf('Microsoft')===0)return 'MSFT'; if(s.indexOf('Tesla')===0)return 'TSLA'; if(s.indexOf('NVIDIA')===0)return 'NVDA'; if(s.indexOf('Alphabet')===0)return 'GOOGL'; if(s.indexOf('Amazon')===0)return 'AMZN'; if(s.indexOf('Walmart')===0)return 'WMT'; if(s.indexOf('JPMorgan')===0)return 'JPM'; if(s.indexOf('Johnson')===0)return 'JNJ'; if(s.indexOf('Meta')===0)return 'META'; if(s.indexOf('Texas')===0)return 'TXN'; if(s.indexOf('Micron')===0)return 'MU'; if(s.indexOf('Qualcomm')===0)return 'QCOM'; if(s.indexOf('UnitedHealth')===0)return 'UNH'; if(s.indexOf('Deere')===0)return 'DE'; if(s.indexOf('Broadcom')===0)return 'AVGO'; if(s.indexOf('Cisco')===0)return 'CSCO'; if(s.indexOf('Boeing')===0)return 'BA'; if(s.indexOf('Salesforce')===0)return 'CRM'; if(s.indexOf('AMD')===0)return 'AMD'; if(s.indexOf('Caterpillar')===0)return 'CAT'; if(s.indexOf('3M')===0)return 'MMM'; if(s.indexOf('General Electric')===0)return 'GE'; return 'AAPL'; };
-    const r = R[keyFor(sel)];
+    // 원문(uploads/def14a_samples) 대조 완료 연결값 — SCT/CAP는 R.s와 검산 일치, TSR·NetIncome($M)·Director Comp·Pay Ratio 원문 추출
+    const CONNECTED = {
+      GOOGL:{ pvpVerified:true, tsrNi:{'2021':[165.17,76033],'2022':[101.30,59972],'2023':[160.89,73795],'2024':[218.20,100118],'2025':[360.95,132170]}, median:310826, ratio:'35:1', ratioN:35, ratioCeoComp:10906079, directorComp:[['Frances H. Arnold',75000,362396,0,437396],['R. Martin Chávez',75000,362396,0,437396],['L. John Doerr',75000,362396,0,437396],['Roger W. Ferguson Jr.',100000,362396,0,462396],['John L. Hennessy',100000,517529,0,617529],['K. Ram Shriram',75000,362396,0,437396],['Robin L. Washington',75000,362396,0,437396]] },
+      JNJ:{ s:[['2021',26741959,39418762],['2022',13099487,18910984],['2023',28397240,13839320],['2024',24302360,16980925],['2025',32758111,68275237]], pvpVerified:true, tsrNi:{'2021':[111.40,20878],'2022':[118.08,17941],'2023':[107.93,35153],'2024':[102.75,14066],'2025':[151.55,26804]}, median:91000, ratio:'360:1', ratioN:360, ratioCeoComp:32784511, directorComp:[['M. C. Beckerle',150000,205000,20000,375000],['J. A. Doudna',125000,205000,40000,370000],['M. A. Hewson',200000,205000,8000,413000],['P. A. Johnson',125000,205000,14000,344000],['H. Joly',142548,205000,20000,367548],['M. B. McClellan',125000,205000,0,330000],['M. A. Weinberger',150000,205000,0,355000],['N. Y. West',125000,205000,20000,350000]] },
+      JPM:{ pvpVerified:true, tsrNi:{'2021':[127.73,48300],'2022':[111.64,37700],'2023':[145.96,49600],'2024':[210.58,58500],'2025':[289.18,57000]}, median:111905, ratio:'363:1', ratioN:363, ratioCeoComp:40644723, directorComp:[['Stephen B. Burke',165000,265000,60000,490000],['Linda B. Bammann',160000,265000,20000,445000],['Todd A. Combs',121522,265000,26195,412717],['Alicia Boler Davis',130000,265000,20000,415000],['Alex Gorsky',130000,265000,20000,415000],['Mellody Hobson',150000,265000,27500,442500],['Phebe N. Novakovic',130000,265000,20000,415000],['Virginia M. Rometty',111304,265000,30000,406304],['Mark A. Weinberger',160000,265000,20000,445000]] },
+      META:{ pvpVerified:true, tsrNi:{'2021':[123.13,39370],'2022':[44.05,23200],'2023':[129.58,39098],'2024':[215.16,62360],'2025':[243.32,60458]}, median:388200, ratio:'65:1', ratioN:65, ratioCeoComp:25125904, directorComp:[['Peggy Alford',131667,421272,733392,1286331],['Marc L. Andreessen',50000,337018,0,387018],['John Arnold',100167,421272,0,521439],['Patrick Collison',35577,1512649,0,1548226],['John Elkann',68772,1654895,0,1723667],['Andrew W. Houston',80000,421272,0,501272],['Nancy Killefer',164333,421272,0,585605],['Robert M. Kimmitt',224333,421272,0,645605],['Hock E. Tan',122000,421272,0,543272],['Tracey T. Travis',118500,421272,0,539772]] },
+      MSFT:{ pvpVerified:true, tsrNi:{'2021':[134,61271],'2022':[128,72738],'2023':[172,72361],'2024':[227,88136],'2025':[255,101832]}, ratio:'480:1', ratioN:480, median:200972, ratioCeoComp:96496790, directorComp:[['Reid G. Hoffman',125000,242500,0,367500],['Hugh F. Johnston',170000,242500,0,412500],['Teri L. List',140000,242500,15000,397500],['Catherine MacGregor',125000,242500,0,367500],['Mark A. L. Mason',125000,242500,0,367500],['Sandra E. Peterson',125000,317500,15000,457500],['Penny S. Pritzker',150000,242500,0,392500],['Carlos A. Rodriguez',175000,242500,0,417500],['Charles W. Scharf',125000,242500,0,367500],['John W. Stanton',140000,242500,15000,397500],['Emma N. Walmsley',125000,242500,0,367500]] },
+      NVDA:{ pvpVerified:true, tsrNi:{'2022':[175.98,9752],'2023':[157.05,4368],'2024':[470.88,29760],'2025':[1100.69,72880],'2026':[1445.67,120067]}, median:282050, ratio:'129:1', ratioN:129, ratioCeoComp:36343830, directorComp:[['Robert K. Burgess',63750,278809,0,342559],['Tench Coxe',85000,278809,0,363809],['John O. Dabiri',85000,278809,0,363809],['Persis S. Drell',85000,278809,0,363809],['Dawn Hudson',85000,278809,0,363809],['Harvey C. Jones',85000,278809,0,363809],['Melissa B. Lora',85000,278809,0,363809],['Stephen C. Neal',85000,278809,0,363809],['A. Brooke Seawell',85000,278809,0,363809],['Aarti Shah',85000,278809,0,363809],['Mark A. Stevens',85000,278809,0,363809]] },
+      WMT:{ pvpVerified:true, tsrNi:{'2022':[101.10,13673],'2023':[105.67,11680],'2024':[123.22,15511],'2025':[222.20,19436],'2026':[272.28,21893]}, median:30520, ratio:'958:1', ratioN:958, ratioCeoComp:29240930, directorComp:[['Cesar Conde',108571,230010,0,338581],['Tim Flynn',141429,230010,976,372415],['Sarah Friar',131429,230010,0,361439],['Carla Harris',131429,230010,0,361439],['Tom Horton',138571,230010,215,368796],['Marissa Mayer',108571,230010,0,338581],['Bob Moritz',108751,230010,843,339604],['Brian Niccol',108751,230010,0,338761],['Greg Penner',221071,342468,0,563539],['Randall Stephenson',156429,230010,413,386852],['Steuart Walton',131429,230010,0,361439]] },
+      AMZN:{ pvpVerified:true, tsrNi:{'2021':[102,33364],'2022':[52,-2722],'2023':[93,30425],'2024':[135,59248],'2025':[142,77670]}, median:40206, ratio:'51:1', ratioN:51, ratioCeoComp:2069861 },
+      TSLA:{ s:[['2020',null,43019000000],['2021',null,15016000000],['2022',null,-9703000000],['2023',null,1403000000],['2024',null,46700000]], pvpVerified:true, tsrNi:{'2020':[843,862],'2021':[1263,5644],'2022':[442,12587],'2023':[891,14974],'2024':[1448,7153]}, dirUSEmptyText:'원문 기준 2024년 비상임이사 보수 미지급(—).' },
+    };
+    const r = {...R[keyFor(sel)], ...(CONNECTED[keyFor(sel)]||{})};
     const isRatio = !!r.ratio;
     const fmtK = (n)=>{ if(n==null||isNaN(Number(n))) return '—'; return '$'+(Number(n)/1000).toFixed(1)+'K'; };
     const occLine = isRatio ? '대표이사(CEO) · 보수는 Summary Compensation Table·CEO Pay Ratio 기준' : '대표이사(PEO) · 보수는 Pay vs Performance 기준';
@@ -2419,7 +2577,13 @@ class Component extends DCLogic {
     const sctIndividual = sct ? sct.rows.map(nr=>{ const isCeo=nr.name===r.ceo; const parts=[nr.salary,nr.bonus,nr.stockAwards,nr.optionAwards,nr.nonEquityIncentive,nr.allOtherCompensation].map(x=>(Number(x)||0)/1e6); return {name:nr.name, position:(nr.role? (nr.role.length>30?nr.role.slice(0,29)+'…':nr.role):(isCeo?'CEO (PEO)':'NEO')), c1:fmtM(nr.salary), c2:fmtM(nr.bonus), c3:fmtM(nr.stockAwards), c4:fmtM(nr.optionAwards), c5:fmtM(nr.nonEquityIncentive), c6:fmtM(nr.allOtherCompensation), total:fmtM(nr.total), parts, breakdown:'급여 '+fmtM(nr.salary)+' · 주식 '+fmtM(nr.stockAwards)+' · 옵션 '+fmtM(nr.optionAwards)+' · 비주식 '+fmtM(nr.nonEquityIncentive)+' (FY'+nr.fy+' · USD)'}; }) : [];
     const officersRaw = sct ? sct.rows.map(nr=>{ const isCeo=nr.name===r.ceo; return {name:nr.name, subId:(isCeo?'CEO (PEO)':'NEO'), position:(nr.role||(isCeo?'CEO':'Named Executive Officer')), badges:(isCeo?['이사','NEO']:['NEO']), status:'현직', occ:(nr.role||(isCeo?'대표이사(CEO/PEO)':'Named Executive Officer'))+' · FY'+nr.fy+' 총보수 '+fmtM(nr.total), since:'—', committee:'—'}; }) : [{name:r.ceo, subId:'CEO (PEO)', position:'CEO', badges:['이사','NEO'], status:'현직', occ:occLine, since:'—', committee:'—'}];
     const officers = officersRaw.map(o=>({...o, badges:o.badges.map(b=>({label:b,style:this.badge(b)})), statusStyle:this.statusStyle(o.status), col4top:o.occ, col4sub:'', col5:'—', col6:o.since, col7:o.committee, metaLines:[{k:'상태',v:o.status},{k:'담당 / 주요경력',v:o.occ},{k:'주식보유',v:'—'},{k:'재직 / 선임',v:o.since},{k:'위원회 / 비고',v:o.committee}]}));
-    const pvp = (r.s||[]).map(row=>({year:row[0], sct:fmt(row[1]), cap:fmt(row[2]), sctN:(Number(row[1])||0)/1e6, capN:(Number(row[2])||0)/1e6, tsr:'—', ni:'—'}));
+    // PvP 원천 데이터 배열 — 원문 Item 402(v) 대조 대상. r.pvpVerified=true면 SCT·CAP·TSR·NetIncome 원문 검산 완료.
+    const _ver = !!r.pvpVerified;
+    const pvpRows = (r.s||[]).map(row=>{ const tn=(r.tsrNi&&r.tsrNi[row[0]])||null;
+      return { year:row[0], sct:row[1], cap:row[2], tsr:tn?tn[0]:null, netIncome:tn?tn[1]:null, verified:_ver,
+        sourceNote:_ver?'원문 Pay vs Performance 표 대조 완료':'SCT·CAP 원문 Pay vs Performance 표 대조 필요' }; });
+    const pvp = pvpRows.map(p=>({year:p.year, sct:fmt(p.sct), cap:fmt(p.cap), sctN:(Number(p.sct)||0)/1e6, capN:(Number(p.cap)||0)/1e6,
+      tsr:(p.tsr!=null)?('$'+Number(p.tsr).toFixed(2)):'—', ni:(p.netIncome!=null)?('$'+(Number(p.netIncome)/1000).toFixed(1)+'B'):'—'}));
     const briefRatio = r.co+' DEF 14A('+r.fy+') 기준 CEO 보수와 CEO Pay Ratio(Item 402(u))입니다. CEO('+r.ceo+') 총보수 '+fmt(r.ceoTotal)+', 직원 중위 보수 $'+Number(r.median).toLocaleString()+', CEO 보수비율 '+r.ratio+'. 본 화면은 원문(DEF 14A) 텍스트에서 추출한 CEO 총보수·직원 중위보수·Pay Ratio를 반영했으며, 이사회 명단·개인별 SCT 구성·NEO 로스터·Outstanding Equity·Pay vs Performance 표는 원문 표 기준입니다.'+(r.coceo?(' ※ '+r.coceo):'');
     const briefPvp = r.co+' DEF 14A('+r.fy+') 기준 CEO·NEO 총보수와 Pay versus Performance 추이입니다. CEO('+r.ceo+') 총보수 '+fmt(r.ceoTotal)+', NEO 1인 평균 '+fmt(r.neoAvg)+', CEO 실지급(CAP) '+fmt(r.cap)+'. 본 화면은 SEC 공시(Item 402(v)) 기반 총보수·CAP·PvP를 우선 반영했으며, 이사회 명단·개인별 SCT 구성·CEO Pay Ratio·직원 중위보수는 원문 표 기준입니다.'+(r.musk?' ※ CEO 보수는 2018년 일괄 옵션 기반으로 연간 SCT가 사실상 $0이며, CAP은 해당 award 공정가치 변동을 반영합니다.':'');
     return {
@@ -2430,7 +2594,7 @@ class Component extends DCLogic {
       kpis:[
         {label:'이사 · 임원 수',value:'—',unit:'',sub:'Directors+NEO · 원문 표 기준',color:'#64748B'},
         {label:'주요 경영진',value:'NEO',unit:'',sub:'Named Executive Officers',color:'#94A3B8'},
-        {label:'직원 수',value:'—',unit:'',sub:'해당사항 없음',color:'#64748B'},
+        {label:'직원 수',value:'—',unit:'',sub:'중위보수(Median) 기준 표시',color:'#64748B'},
         {label:'CEO 총보수',value:fmt(r.ceoTotal),unit:'',sub:r.ceo+' (FY SCT)',color:'#F1F5F9'},
         isRatio ? {label:'직원 중위 보수',value:fmtK(r.median),unit:'',sub:'median (Item 402u)',color:'#F1F5F9'} : {label:'NEO 1인 평균',value:fmt(r.neoAvg),unit:'',sub:'NonPEO NEO 평균 (PvP)',color:'#F1F5F9'},
         {label:'주식보상',value:'제공',unit:'✓',sub:'RSU·PSU·Option (원문)',color:'#4ADE80'},
@@ -2465,9 +2629,15 @@ class Component extends DCLogic {
       equityEmptyText:'해당 문서에서는 주식보상 현황이 제공되지 않습니다.',
       ratioAvailable: isRatio, payRatioDisp: r.ratio||'', payRatioN: r.ratioN||0,
       payRatioSub: isRatio ? ('CEO 총보수 '+fmt(r.ceoTotal)+' ÷ 직원 중위 $'+Number(r.median).toLocaleString()+' = '+r.ratio+' · SEC Item 402(u)') : '',
+      payRatioCeoTotal: fmt(r.ceoTotal),
+      payRatioMedianDisp: (r.median!=null) ? ('$'+Number(r.median).toLocaleString()) : '—',
+      payRatioMedianN: (r.median!=null) ? r.median : null,
       pvpStatus: isRatio ? 'not_in_filing' : 'available',
       pvpEmptyText:'해당 문서에서는 SEC 표준 보상-성과(Pay-vs-Performance) 블록이 확인되지 않았습니다. CEO Pay Ratio 공시를 우선 표시합니다.',
       payVsPerf:pvp,
+      pvpVerified: !!r.pvpVerified,
+      dirUSEmptyText: r.dirUSEmptyText,
+      dirUSPaid: r.directorComp ? { rows: r.directorComp.map(dc=>({ label:dc[0], sub:'현금 $'+dc[1].toLocaleString()+' · 주식 $'+dc[2].toLocaleString()+' · 기타 $'+dc[3].toLocaleString(), amount:'$'+dc[4].toLocaleString() })) } : undefined,
       isApplicable:true,
       amendment:{ isAmended:false, badge:'', originalFilingDate:'', amendedSections:'', reason:'' },
       deferred:{ available:false, emptyText:'해당 문서에서는 퇴직·이연 보상이 별도 항목으로 제공되지 않습니다.', rows:[] },
@@ -2514,7 +2684,7 @@ class Component extends DCLogic {
       kpis:[
         {label:'이사 · 임원 수',value:'5',unit:'명',sub:'이사 5 (독립이사 4)',color:'#F1F5F9'},
         {label:'주요 경영진',value:'5',unit:'명',sub:'NEO · CEO·CFO·COO·CTO·CLO',color:'#F1F5F9'},
-        {label:'직원 수',value:'—',unit:'',sub:'해당사항 없음',color:'#64748B'},
+        {label:'직원 수',value:'—',unit:'',sub:'중위보수(Median) 기준 표시',color:'#64748B'},
         {label:'총보수',value:'$11.99',unit:'M',sub:'CEO 총보수 (FY2025 SCT)',color:'#F1F5F9'},
         {label:'1인 평균 · 중위 보수',value:'$64.1',unit:'K',sub:'직원 중위 보수(median)',color:'#F1F5F9'},
         {label:'주식보상',value:'제공',unit:'✓',sub:'RSU · PSU · Option',color:'#4ADE80'},
@@ -2670,8 +2840,22 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
 - 원문 표는 sourceTables.{officers, summaryCompensation, directorCompensation}에 columns/rows 원문 그대로 보존 → '원문 표 보기' 모달 연결.
 - 원문 표가 실제 존재하는데 미파싱이면 dataStatus를 requires_parsing(추가 추출 대상)으로 두되 사유를 "원문 표 존재·정형화 추가 필요"로 명시. 원문에 표 자체가 없으면 not_provided/not_applicable.
 
+# 4-2. 최신 공통 UI 구조 매핑 (필수)
+- 임원 및 이사 현황 = 3블록: directors[](이사회 구성: name·role·independent·directorSince·committee·nomineeStatus) / execOfficers[](집행임원·KR 미등기: name·title·since) / 주요 보수 대상자(KR 5억원↑ over / US NEO=SCT rows). KR 등기/미등기·US Director/NEO 라벨 혼용 금지.
+- 직원 등 현황 = empRows[]{businessDivision, jobCategory, gender, regular, regularPartTime, fixedTerm, total, averageTenure, averagePay} + empAxis("biz"|"job"|"gender"|"mixed"|"total"). 단시간은 정규직 내 중복 집계이므로 total에 중복 합산 금지(partTimeIncluded로 별도 표기). axis가 mixed/total이면 그래프 대신 표 중심.
+- 이사 보수 = regime 분기: KR{shareholderApprovedLimit[], paidCompensation[], budgetExecutionRate} / US{policyNote, directorCompensation[]{name,feesEarnedOrPaidInCash,stockAwards,optionAwards,allOtherCompensation,total}}. 영문 원문명은 섹션 타이틀이 아닌 내부 필드/설명에만.
+- 인센티브 및 주식보상 = equityKR{주식매수선택권 수량: grantedQty·exercisedQty·canceledQty·outstandingQty·exercisePrice·grantDate·granteeType·soState} / equityUS{금액: stockAwards·optionAwards(SCT 기준 USD)} + outstandingEquity[](Outstanding Equity Awards 별도 하위: 수량·행사가·만기). 수량과 금액을 같은 의미로 합치지 않는다.
+- CEO–직원 보수배율 = payRatio{ceoComp, ceoCompBasis, medianEmployeePay, ratio, ratioCeoComp, employeeCount, ratioVerified}. SCT total과 ratioCeoComp는 별도 보존(강제 동일 금지). 직원 중위보수는 직원 섹션에서도 참조.
+- 보상-성과 지표 = pvpRows[]{year, sct, cap, companyTSR, peerTSR, netIncome, companySelectedMeasure, sourceUnit, sourceNote} + pvpVerified. CAP·NetIncome 단위(dollars/millions/$B)·TSR($100 index) 확인. 전 필수값 원문 대조·검산 통과 시에만 pvpVerified=true(미검증이면 SCT/CAP만 표시, 인사이트 생성 금지).
+- 퇴직·이연·연금 보상 = Pension / Deferred / Termination / CIC.
+
+# 4-3. 상태값 체계 (11종 · 5라벨 폐기)
+모든 섹션·필드는 state ∈ {connected, unconnected, not_provided, not_applicable, not_in_form, unverified, needs_structuring, partial, check, policyOnly, connected_zero} 중 하나.
+- 추출 JS에 없음 ≠ 원문 없음. 원문 있음/추출 미반영=unconnected, 원문 있음/정형화 필요=needs_structuring, 문서 기준상 미제공=not_in_form, 회사·기간 실제 발생 없음=not_applicable(또는 표가 전원 "—"면 connected_zero), 원문 대조 전=unverified, 정책만=policyOnly, 일부=partial, 비표준·해석 주의=check.
+- 각 row에 state·sourceUnit·displayUnit·sourceNote·verificationNote 포함. 금지 문구(해당사항 없음·없음 어미·확인 불가·현재 확인할 수 없습니다·데이터 없음·추가 추출 필요)는 출력하지 않는다.
+
 # 5. 출력 JSON 구조
-값이 없으면 null 또는 빈 배열로 두고 임의 생성하지 않는다.
+값이 없으면 null 또는 빈 배열로 두고 임의 생성하지 않는다. 각 섹션에 state(11종) 필드를 둔다.
 
 {
   "document": {
@@ -2803,11 +2987,11 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       {key:'employees', desc:'직원 등 현황 (KR 중심)'},
       {key:'workLifePrograms', desc:'육아지원·유연근무'},
       {key:'executiveCompensationSummary', desc:'임원 보수 요약 (KR 미등기 / US NEO)'},
-      {key:'directorCompensation', desc:'이사·감사 / Director 보수'},
+      {key:'directorCompensation', desc:'이사 보수 (KR 한도·집행 / US 실지급)'},
       {key:'individualCompensation', desc:'개인별 보수 / SCT (퇴직·이연 포함)'},
-      {key:'equityCompensation', desc:'주식보상·옵션 (원문 유형 보존)'},
+      {key:'equityCompensation', desc:'인센티브 및 주식보상 (KR 수량 / US 금액)'},
       {key:'deferredAndTerminationCompensation', desc:'퇴직·이연·해임/CIC 보상 (US 중심)'},
-      {key:'payRatioAndPerformance', desc:'CEO Pay Ratio · Pay vs Performance'},
+      {key:'payRatioAndPerformance', desc:'CEO–직원 보수배율 · 보상-성과 지표'},
       {key:'notes', desc:'주석·비고·footnote'},
     ];
   }
@@ -2819,18 +3003,18 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
     {from:'이사·감사 전체 보수',to:'이사·감사 보수 요약'},
     {from:'유형별 보수',to:'유형별 보수 테이블'},
     {from:'개인별 보수지급금액',to:'개인별 보수 상세'},
-    {from:'주식매수선택권 부여·행사',to:'주식보상 / 옵션'},
+    {from:'주식매수선택권 부여·행사',to:'인센티브 및 주식보상'},
   ];}
   usMap(){return[
     {from:'Executive Officers',to:'임원 및 이사 현황'},
     {from:'Director Nominees',to:'임원 및 이사 현황'},
-    {from:'Director Compensation',to:'Director 보수'},
+    {from:'Director Compensation',to:'이사 보수'},
     {from:'Summary Compensation Table',to:'개인별 보수 상세'},
-    {from:'Grants of Plan-Based Awards',to:'주식보상 / 부여'},
-    {from:'Outstanding Equity Awards',to:'미귀속·미행사 보상'},
-    {from:'Option Exercises & Stock Vested',to:'행사 / 귀속'},
-    {from:'CEO Pay Ratio',to:'US 전용 보상 지표'},
-    {from:'Pay Versus Performance',to:'US 전용 보상-성과'},
+    {from:'Grants of Plan-Based Awards',to:'인센티브 및 주식보상'},
+    {from:'Outstanding Equity Awards',to:'인센티브 및 주식보상 (Outstanding Equity)'},
+    {from:'Option Exercises & Stock Vested',to:'인센티브 및 주식보상 (행사·귀속)'},
+    {from:'CEO Pay Ratio',to:'CEO–직원 보수배율'},
+    {from:'Pay Versus Performance',to:'보상-성과 지표'},
   ];}
   ruleCards(){return[
     {title:'문서 판정 · 정정 처리',accent:'#22C55E',items:[
@@ -2845,11 +3029,20 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       '퇴직·이연·연금 보상(Pension·Deferred·Termination·CIC)은 개인별 보수 상세 하위 accordion으로만 표시.',
       'SAR 등 보상유형은 원문 유형 badge로 보존, 단일 주식보상으로 뭉개지 않음.',
     ]},
-    {title:'Empty State 규칙',accent:'#F59E0B',items:[
-      '원문에 없는 데이터는 임의 생성하지 않는다.',
-      '없는 섹션은 빈 표로 노출하지 않는다 — 5개 상태 라벨(제공/해당사항 없음/원문 미기재/추가 추출 대상/일부 표시)로 표시.',
-      '0과 없음은 다르다. N/A·해당없음·미기재·공란은 내부 구분, UI는 일관된 empty state.',
-      'SEC에 DART식 직원 현황이 없으면 섹션 숨김 또는 empty state.',
+    {title:'상태값 11종 · empty 문구 매핑',accent:'#F59E0B',items:[
+      '내부 상태값(11): connected · unconnected · not_provided · not_applicable · not_in_form · unverified · needs_structuring · partial · check · policyOnly · connected_zero.',
+      '핵심 구분: 추출 JS에 없음 ≠ 원문 없음. 원문 있음/추출 미반영=unconnected, 원문 있음/정형화 필요=needs_structuring, 문서 기준상 미제공=not_in_form, 실제 발생 없음=not_applicable/connected_zero, 원문 대조 전=unverified.',
+      '사용자 문구(문장형 고정): not_in_form→"해당 문서에서는 제공되지 않습니다. (공시 기준 차이)" · not_provided→"원문에서 해당 항목을 확인할 수 없습니다." · unconnected→"현재 연결된 데이터가 없습니다." · needs_structuring→"원문 표 정형화가 필요합니다." · not_applicable/connected_zero→"원문 기준 해당 보수 지급 내역이 없습니다." · unverified→"원문 기준 확인이 필요합니다." · check→"원문 구조상 추가 확인이 필요합니다." · policyOnly→"보수 정책만 제공됩니다." · partial→"일부 항목만 연결되었습니다."',
+      '금지 문구(화면 0건): 해당사항 없음 · 없음(어미) · 확인 불가 · 현재 확인할 수 없습니다 · 데이터 없음 · 추가 추출 필요. empty-state 타이틀 없이 문장형 본문만, compact 좌측정렬 row로 표시(큰 dashed box 금지).',
+      'KR/US 같은 상태값이면 동일 문구. 0과 없음(미발생)은 다르다.',
+    ]},
+    {title:'최신 공통 UI 구조 규칙',accent:'#2DD4BF',items:[
+      '공통 섹션 타이틀 고정(KR/US 동일): 임원 및 이사 현황 / 직원 등 현황 / 임원 보수 요약 / 이사 보수 / 개인별 보수 상세 / 인센티브 및 주식보상 / CEO–직원 보수배율 / 보상-성과 지표 / 퇴직·이연·연금 보상 / 주석·산정 기준. 섹션명에 영문 원문명 금지(badge/설명문만).',
+      '임원 및 이사 현황 = 3블록: 이사회 구성 / 집행임원·미등기 / 주요 보수 대상자. 직원 그래프는 empAxis(biz·job·gender·mixed·total) 판정 후 biz/job/both는 그래프, mixed/total은 표 중심.',
+      '이사 보수 = 2카드 골격: KR(보수 한도·정책 + 실제 지급액 + 집행률) / US(정책·기준 + Director Compensation 실지급). 두 카드 모두 실데이터 없으면 1 compact로 병합 허용.',
+      '인센티브 및 주식보상: KR 주식매수선택권 수량(주) / US Stock·Option Awards 금액(USD) 하위 블록 분리, Outstanding Equity는 별도 하위. 단위·의미 합치지 않음.',
+      'CEO–직원 보수배율: ceoComp·ceoCompBasis·medianEmployeePay·ratio·ratioCeoComp·employeeCount. SCT total과 Pay Ratio CEO comp는 별도 보존(강제 동일 금지).',
+      '보상-성과 지표: pvpRows[year,sct,cap,companyTSR,peerTSR,netIncome,companySelectedMeasure]+pvpVerified. 원문 대조·단위(CAP·NetIncome millions) 검산 완료 시에만 pvpVerified=true·TSR/순이익 컬럼 표시·인사이트 허용. 미검증이면 SCT vs CAP만+amber. 좌 차트/우 표 50:50, badge 최소화.',
     ]},
     {title:'단위 / 통화 / 반올림',accent:'#3B82F6',items:[
       'rawValue와 displayValue를 모두 저장, sourceUnit 보존.',
@@ -2883,6 +3076,14 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
     'KR 미등기임원 보수와 US NEO 보상을 같은 개념처럼 표현하지 않았는가',
     '주식매수선택권·Option·RSU·PSU·Stock Award를 원문 유형대로 보존했는가',
     '출처 section/table/page가 보존되는가',
+    'Director Compensation total = 현금+주식+옵션+기타 합계 검산 통과(컬럼 없으면 null, 0 입력 금지)',
+    'SCT total = 구성요소 합계 검산, Pay Ratio ceoComp/median/ratio 검산(반올림 차는 PASS-ROUNDING)',
+    'SCT total과 Pay Ratio CEO comp(ratioCeoComp)를 같은 값으로 강제하지 않고 별도 보존했는가',
+    'pvpRows를 원문 Pay vs Performance 표와 대조했고, 전 필수값+단위 검산 통과 시에만 pvpVerified=true인가',
+    'CAP·Net Income 단위(dollars/millions/$B) 및 TSR 기준($100 index)을 확인했는가',
+    'KR 보수 한도 대비 지급률, 직원 단시간의 정규직 내 중복 합산 방지, 주식매수선택권 수량 합계를 검산했는가',
+    'empty-state 금지 문구 0건이며 KR/US 같은 상태값은 동일 문구로 표시되는가',
+    '공통 섹션 타이틀이 KR/US 동일하고 섹션명에 영문 원문명이 없는가',
     '모바일에서 표 정보가 누락되지 않는가',
     'Copy 버튼이 정상 동작하는가',
   ];}
@@ -2958,6 +3159,25 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       const labels=pvp.map((p,i)=>({t:p.year.slice(2),x:(padX+step*i+step/2).toFixed(1),y:(H-8).toFixed(1)}));
       pvpCombo={W,H,cols,linePts,dots,labels};
     }
+    // compact grouped mini-bar (SCT vs CAP) — 추세 요약용, 저강조(미검증)
+    let pvpMini=null;
+    if(pvp.length){
+      const vals=pvp.flatMap(p=>[p.sctN,p.capN]).filter(v=>isFinite(v));
+      const mx=Math.max(...vals,0), mn=Math.min(...vals,0);
+      const W=280,H=118,padX=14,padT=12,padB=22, plotH=H-padT-padB, plotW=W-2*padX;
+      const range=(mx-mn)||1;
+      const yOf=v=> padT + ((mx-v)/range)*plotH;
+      const zeroY=yOf(0);
+      const n=pvp.length, step=plotW/n, bw=Math.min(9, step*0.28);
+      const bars=[];
+      pvp.forEach((p,i)=>{ const cx=padX+step*i+step/2;
+        [[p.sctN,'#7CC4FF'],[p.capN,'#5EE6C8']].forEach((pair,j)=>{ const v=pair[0]||0, c=pair[1];
+          const x=cx + (j===0? -bw-1 : 1); const y1=yOf(v);
+          bars.push({x:x.toFixed(1), y:Math.min(zeroY,y1).toFixed(1), w:bw.toFixed(1), h:Math.max(2,Math.abs(y1-zeroY)).toFixed(1), color:c}); });
+      });
+      const labels=pvp.map((p,i)=>({t:p.year.slice(2), x:(padX+step*i+step/2).toFixed(1), y:(H-7).toFixed(1)}));
+      pvpMini={W,H,padX:padX.toFixed(1),plotW:(W-padX).toFixed(1),zeroY:zeroY.toFixed(1),bars,labels};
+    }
     // 5. 승인 한도 대비 지급률 → PROGRESS RINGS
     const bu = d.budgetUse || {};
     const budgetAvailable = !!bu.available;
@@ -3010,8 +3230,53 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       empInsight={ topDiv:top.div, topVal:top.total.toLocaleString(),
         total:empColData.reduce((s,c)=>s+c.total,0).toLocaleString(), divCount:empColData.length };
     }
+    // 직원 그래프 분류축 타입 판정(2차) — 원문 분류 기준 왜곡 방지
+    const _divLabels = empColData.map(c=>c.div);
+    const _jobKw=/직$|직군|직무|사무|생산|연구|관리|영업|기술|품질|현장|개발|제조|디자인|마케팅|서비스/;
+    const _bizKw=/사업부|부문|본부|사업|컴퍼니|company|division|BU/i;
+    let _genders=new Set();
+    empColData.forEach(c=>c.segs.forEach(s=>{ if(s.label==='남'||s.label==='여') _genders.add(s.label); }));
+    const empHasGenderSplit = _genders.has('남') && _genders.has('여');
+    const _perDivSingleGender = empColData.filter(c=>{ const gl=new Set(c.segs.map(s=>s.label).filter(l=>l==='남'||l==='여')); return gl.size===1; });
+    const _anyDivBoth = empColData.some(c=>{ const gl=new Set(c.segs.map(s=>s.label).filter(l=>l==='남'||l==='여')); return gl.size===2; });
+    // 혼합/비표준: 부문별 성별 구성이 일관되지 않거나(일부만 단일성별), 전 부문이 단일성별인데 부문 간 성별이 갈리는 경우
+    const _genderInconsistent = empColData.length>1 && (
+      (_perDivSingleGender.length>0 && _perDivSingleGender.length<empColData.length) ||
+      (empHasGenderSplit && !_anyDivBoth)
+    );
+    const _allGenericTotal = _divLabels.length>0 && _divLabels.every(l=>/전사|전체|합계/.test(l));
+    let _axisKind, _baseTitle, empGraphShow, empAxisLabel;
+    if(empColData.length===0 || _allGenericTotal){ _axisKind='비표준'; _baseTitle='직원 현황'; empGraphShow=false; empAxisLabel='분류 항목'; }
+    else if(_genderInconsistent){ _axisKind='혼합'; _baseTitle='원문 분류 기준 직원 현황'; empGraphShow=false; empAxisLabel='분류 항목'; }
+    else {
+      const jobN=_divLabels.filter(l=>_jobKw.test(l)).length;
+      const bizN=_divLabels.filter(l=>_bizKw.test(l)).length;
+      if(bizN>=jobN && bizN>0){ _axisKind='사업부문'; _baseTitle='사업부문별 직원 수'; empAxisLabel='사업부문'; }
+      else if(jobN>0){ _axisKind='직군'; _baseTitle='직군별 직원 수'; empAxisLabel='직군'; }
+      else { _axisKind='사업부문'; _baseTitle='사업부문별 직원 수'; empAxisLabel='사업부문'; }
+      empGraphShow=true;
+    }
+    const empChartTitle = empGraphShow ? (_baseTitle + (empHasGenderSplit?' · 성별 구성':'')) : _baseTitle;
+    const empAxisNote = empGraphShow ? '' : (_genderInconsistent
+      ? '원문 분류 기준이 사업부문·직군·성별로 혼재되어, 그래프 대신 아래 표로 정확히 표시합니다.'
+      : '원문에 사업부문·직군 구분이 없어(전사 단일 집계) 아래 표로 표시합니다.');
+    const empTopLabel = '최다 인원 ' + (empAxisLabel==='분류 항목' ? '구분' : empAxisLabel);
+    // 인센티브/주식보상(2차): US는 금액(Stock·Option Awards, SCT 기준), KR은 수량(주식매수선택권)
+    const usEquityRows = (d.market==='US') ? (d.individualComp||[]).map(p=>{
+      const st=(p.parts&&p.parts[2])||0, op=(p.parts&&p.parts[3])||0;
+      return {name:p.name, position:p.position||'', stock:p.c3, option:p.c4, sub:'$'+(st+op).toFixed(2)+'M', subN:st+op};
+    }).filter(r=>r.subN>0) : [];
+    const usEquityShow = d.market==='US' && usEquityRows.length>0;
+    const usEquityTotalDisp = usEquityShow ? ('$'+(usEquityRows.reduce((s,r)=>s+r.subN,0)).toFixed(2)+'M') : '—';
+    const equitySubtitle = d.market==='US'
+      ? 'Stock Awards · Option Awards · 금액(USD) 기준 · Summary Compensation Table'
+      : '주식매수선택권 · 수량(주) 기준 · 원문 유형 보존(RSU·PSU·Option 등)';
+    // CAP 값이 원문 대조 전(미검증)이면 인사이트 문구를 생성하지 않음(2차)
     let pvpInsight=null;
-    if(pvp.length){ const ce=pvp.find(p=>p.capN>p.sctN); pvpInsight = ce?`CAP이 ${ce.year}년 이후 SCT를 상회 · TSR·순이익 우상향`:'CAP이 SCT를 하회'; }
+    if(pvp.length && d.pvpVerified){ const ce=pvp.find(p=>p.capN>p.sctN); pvpInsight = ce?('실지급 보수(CAP)가 '+ce.year+'년 회계연도에 명목 보수(SCT)를 상회'):'전 기간 실지급 보수(CAP)가 명목 보수(SCT) 이하'; }
+    const pvpVerifyNote = (pvp.length && !d.pvpVerified)
+      ? '표시된 명목 보수(SCT)·실지급 보수(CAP)는 원문(DEF 14A Pay vs Performance) 기준 확인이 필요합니다.'
+      : '';
 
     // ----- scope / amendment / employment chips / deferred -----
     const inScope = d.isApplicable !== false && !d.isPending;
@@ -3026,25 +3291,64 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       {label:'기간제', value:empTotalRow.fixed+'명'},
       {label:'합계', value:empTotalRow.total+'명'},
     ] : [];
+    // 직원 우측 보조문구 — 회사별 데이터 바인딩 (하드코딩 제거)
+    let empSummary=null;
+    if(empTotalRow){
+      const _norm=(v)=> (v==null?'':String(v)).trim();
+      const reg=_norm(empTotalRow.permanent);
+      const fix=_norm(empTotalRow.fixed);
+      const permPart=_norm(empTotalRow.permPart);
+      const fixNone=(fix===''||fix==='—'||fix==='0'||fix==='0명');
+      const hasReg=(reg!==''&&reg!=='—');
+      const hasPermPart=(permPart!==''&&permPart!=='—'&&permPart!=='0');
+      const empParts=[];
+      empParts.push(hasReg?('정규직 '+reg+'명'):'정규직 원문 표기 기준');
+      empParts.push(fixNone?'기간제 없음':('기간제 '+fix+'명'));
+      if(hasPermPart) empParts.push('단시간 '+permPart+'명(정규직 내 중복)');
+      const employmentLine=empParts.join(' · ');
+      const tenure=_norm(empTotalRow.tenure);
+      const per=_norm(empTotalRow.perPerson);
+      const hasTenure=(tenure!==''&&tenure!=='—');
+      const hasPer=(per!==''&&per!=='—');
+      const metricParts=[];
+      if(hasTenure) metricParts.push('평균근속 '+tenure);
+      if(hasPer) metricParts.push('1인 평균급여 '+per+'백만원');
+      const metricLine=metricParts.length?metricParts.join(' · '):'평균근속·1인 평균급여는 원문 표 기준';
+      empSummary={ employmentLine, metricLine };
+    }
     // 직원 part-time 필드 정규화 — 정규직 내부 단시간은 합계에 중복 합산하지 않음(원문 구조 보존)
     const employeesView = (d.employees||[]).map(e=>({...e, permPart:(e.permPart!=null?e.permPart:'—'), fixedPart:(e.fixedPart!=null?e.fixedPart:'—')}));
     // 임원 그룹화 — KR: 등기/미등기, US: 단일 그룹
     const offs = d.officers || [];
     offs.forEach(o=>{ o.badgesDesktop = (o.badges||[]).filter(b=>b.label!=='등기'&&b.label!=='미등기'); });
     const hasLabel=(o,l)=>(o.badges||[]).some(b=>b.label===l);
+    // 인물 구조 재정리(2차): A 이사회 구성 / B 집행임원·미등기 / C 주요 보수 대상자
+    // KR 등기·미등기 체계와 US NEO·Director 체계를 한 표에 섞지 않고 의미 블록으로 분리
     const buildGroups=(list)=>{
-      if(d.market==='KR'){
-        const reg=list.filter(o=>hasLabel(o,'등기'));
-        const unreg=list.filter(o=>hasLabel(o,'미등기'));
-        const other=list.filter(o=>!hasLabel(o,'등기')&&!hasLabel(o,'미등기'));
-        const g=[];
-        if(reg.length) g.push({title:'등기임원', count:reg.length, officers:reg});
-        if(unreg.length) g.push({title:'미등기임원', count:unreg.length, officers:unreg});
-        if(other.length) g.push({title:'기타 임원', count:other.length, officers:other});
-        return g;
+      if(d.market==='US'){
+        const neo=list; // Summary Compensation Table 기준 NEO
+        return [
+          {title:'이사회 구성', subtitle:'Board of Directors', count:0, officers:[], empty:true,
+            emptyText:'DEF 14A 원문에서 이사회 전체 명단은 개별 표로 확인되지 않습니다. (NEO·집행임원과 별개 제도)'},
+          {title:'집행임원 (Executive Officers)', subtitle:'Executive Officers', count:0, officers:[], empty:true,
+            emptyText:'현재 연결된 원문 데이터 범위에서는 집행임원 별도 명단을 확인할 수 없습니다.'},
+          ...(neo.length ? [{title:'주요 보수 대상자 · NEO', subtitle:'Named Executive Officers · Summary Compensation Table', count:neo.length, officers:neo, empty:false}] : []),
+        ];
       }
-      return list.length ? [{title:(d.officerGroupTitle||'이사 · 임원'), count:list.length, officers:list}] : [];
+      const reg=list.filter(o=>hasLabel(o,'등기'));
+      const unreg=list.filter(o=>hasLabel(o,'미등기'));
+      const other=list.filter(o=>!hasLabel(o,'등기')&&!hasLabel(o,'미등기'));
+      const g=[];
+      g.push(reg.length
+        ? {title:'이사회 구성', subtitle:'사내이사 · 사외이사 · 감사 · 기타비상무이사 (등기임원)', count:reg.length, officers:reg, empty:false}
+        : {title:'이사회 구성', subtitle:'등기임원', count:0, officers:[], empty:true, emptyText:'해당 문서에서는 등기임원 명단이 별도로 확인되지 않습니다.'});
+      g.push(unreg.length
+        ? {title:'집행임원 · 미등기임원', subtitle:'미등기 집행임원', count:unreg.length, officers:unreg, empty:false}
+        : {title:'집행임원 · 미등기임원', subtitle:'미등기 집행임원', count:0, officers:[], empty:true, emptyText:'해당 문서에서는 미등기임원이 별도로 확인되지 않습니다.'});
+      if(other.length) g.push({title:'기타 임원', subtitle:'', count:other.length, officers:other, empty:false});
+      return g;
     };
+    const labelGroups=(arr)=>arr.map(g=>({...g, groupLabel:g.title+(g.empty?'':' · '+g.count+'명'), subtitleDisp:g.subtitle||''}));
     const rosterPartial = /대표\s*(일부|[\d,]+\s*명)/.test(d.officersNote||'') || (d.unregTableCount!=null);
     const DISPLAY_LIMIT=12;
     // 원문 표(sourceTables.officers): 명시 데이터가 있으면 사용, 없고 보유 명단이 완전하면(부분표시 아님) 보유 데이터로 구성
@@ -3061,8 +3365,13 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
     }
     const hasSourceTable = !!(srcOfficers && srcOfficers.rows && srcOfficers.rows.length);
     const rosterModalAvailable = hasSourceTable && (d.market==='KR' || offs.length > 6 || d.market==='US');
-    const officerGroups = buildGroups(offs.length > DISPLAY_LIMIT ? offs.slice(0, DISPLAY_LIMIT) : offs);
-    const fullOfficerGroups = buildGroups(offs);
+    const officerGroups = labelGroups(buildGroups(offs.length > DISPLAY_LIMIT ? offs.slice(0, DISPLAY_LIMIT) : offs));
+    const fullOfficerGroups = labelGroups(buildGroups(offs));
+    // 블록 C: 주요 보수 대상자 (KR 5억원↑ → 개인별 보수 섹션 연결). US는 NEO가 위 표 블록 C에 이미 포함.
+    const compPersons = (d.individualComp||[]).slice(0,8).map(p=>({name:p.name, position:p.position||'', total:p.total||''}));
+    const compPersonsShow = compPersons.length>0 && d.market==='KR';
+    const compPersonsTitle = '주요 보수 대상자 · 5억원 이상';
+    const compPersonsNote = '아래 인물의 보수 구성은 「개인별 보수 상세」 섹션에서 확인할 수 있습니다.';
     const rosterStatusOnly = false;
     const rosterTotalCount = (srcOfficers && srcOfficers.rows) ? srcOfficers.rows.length : offs.length;
     const rosterButtonCount = rosterTotalCount;
@@ -3074,8 +3383,8 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       : '';
     // 미제공(not_provided) vs 해당없음(not_applicable) 구분
     const indivKind = d.individualEmptyKind || (d.market==='KR' ? 'not_applicable' : 'not_provided');
-    const KIND_LABEL={not_applicable:'해당사항 없음', not_provided:'원문 미기재', requires_parsing:'원문 미기재'};
-    const indivEmptyTitle = d.market==='US' ? '현재 확인할 수 없습니다' : '해당사항 없음';
+    const KIND_LABEL={not_applicable:'대상 없음', not_provided:'원문 미기재', requires_parsing:'정형화 필요'};
+    const indivEmptyTitle = '';
     const indivEmptyText = indivKind==='not_applicable'
       ? '해당 기준에 해당하는 대상자가 없습니다. (보수지급금액 5억원 이상 개인별 공시 대상 없음)'
       : (d.market==='US'
@@ -3097,7 +3406,7 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
     const unregCountNote = (unregTableCount!=null && unregCompCount!=null && unregTableCount!==unregCompCount)
       ? `※ 미등기임원 수는 임원현황 표 기준 ${unregTableCount}명, 미등기임원 보수현황 기준 ${unregCompCount}명으로 원문상 산정 대상이 달라 별도 수치로 표기합니다.`
       : '';
-    const STATUS_LABELS={provided:'제공', not_applicable:'해당사항 없음', not_provided:'원문 미기재', requires_parsing:'추가 추출 대상', partial_display:'일부 표시'};
+    const STATUS_LABELS={provided:'제공', not_applicable:'대상 없음', not_provided:'원문 미기재', requires_parsing:'정형화 필요', partial_display:'일부 표시'};
     const officersPartialNote = (d.officersNote||'').replace(/\s*(미등기임원\s*[\d,]+\s*명?\s*전원은\s*)?(전체\s*명단은\s*)?원문\s*표를?\s*참(조|고)하세요\.?/g,'').trim();
     const rosterPartialLabel = (d.unregTableCount!=null)
       ? ('전체 미등기임원 '+Number(d.unregTableCount).toLocaleString()+'명 중 대표 일부만 상세 표시')
@@ -3140,18 +3449,24 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       officerDonut, officerTotal, officerDistSegs,
       compColumns, compLegend,
       awardDonut, awardTotal, awardTotalDisp:awardTotal.toLocaleString(), awardLegend, equityRows,
-      equityHasRows: equityRows.length>0, equityEmptyState: equityRows.length===0,
-      pvpCombo, ratioGauge,
+      equityHasRows: equityRows.length>0, equityEmptyState: equityRows.length===0 && !usEquityShow,
+      usEquityShow, usEquityRows, usEquityTotalDisp, equitySubtitle,
+      pvpCombo, pvpMini, ratioGauge,
       budgetAvailable, budgetEmpty:!budgetAvailable, budgetRings, budgetEmptyText, empColumns,
       compSummary, equityMetrics, empInsight, pvpInsight,
       docSummaryShow: !d.isPending && d.isApplicable !== false,
-      equityEmptyTitle: '해당사항 없음',
-      equityEmptyText: d.equityEmptyText || (d.equityEmptyKind === 'unprovided'
-        ? '본 문서에서 주식매수선택권 부여 사실 여부가 명시적으로 확인되지 않았습니다.'
-        : '당기 주식매수선택권 부여·행사 내역이 없습니다. (주식매수선택권 부여 및 행사현황)'),
+      equityEmptyTitle: '',
+      equityEmptyText: d.market==='US'
+        ? '원문에서 해당 항목을 확인할 수 없습니다.'
+        : (d.equityEmptyKind === 'unprovided'
+            ? '주식매수선택권 부여 사실은 있으나 개인별 상세는 원문 표 정형화가 필요합니다.'
+            : '당기 주식매수선택권 부여·행사 내역이 없습니다.'),
       inScope, outOfScope, isPending, pendingScope:d.pendingScope||'', pendingCeo:d.pendingCeo||'', isAmended, amendmentBadge:amd.badge||'', amendmentOriginal:amd.originalFilingDate||'', amendmentSections:amd.amendedSections||'', amendmentReason:amd.reason||'',
       oosTitle:d.oosTitle||'', oosSub:d.oosSub||'',
       empChips, employees: employeesView, officerGroups, workLifeEmpty,
+      compPersons, compPersonsShow, compPersonsTitle, compPersonsNote,
+      empChartTitle, empGraphShow, empAxisNote, empHasGenderSplit, empAxisLabel, empTopLabel,
+      pvpVerifyNote,
       officersMobile: (this.state.isMobile && !this.state.showAllOff) ? offs.slice(0,3) : offs,
       offShowMore: this.state.isMobile && offs.length>3 && !this.state.showAllOff,
       offShowLess: this.state.isMobile && offs.length>3 && this.state.showAllOff,
@@ -3183,8 +3498,8 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       rosterStop: (e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); },
       individualSourceLabel, compContextNote,
       indivSectionEmpty, showIndivNull, showDeferredAccordion,
-      deferredAvailable, deferredEmpty:!deferredAvailable, deferredRows:def.rows||[], deferredEmptyText:def.emptyText||'해당 문서에서는 퇴직·이연 보상이 별도 항목으로 제공되지 않습니다.',
-      employeesEmptyTitle: STATUS_LABELS.not_applicable,
+      deferredAvailable, deferredEmpty:!deferredAvailable, deferredRows:def.rows||[], deferredEmptyText:'해당 문서에서는 제공되지 않습니다.',
+      employeesEmptyTitle: '',
       employeesEmptyText: d.employeesEmptyText || (d.market==='US' ? '해당 문서에서는 직원 등 현황이 제공되지 않습니다.' : '원문에 직원 등 현황이 제공되지 않습니다.'),
       // ---- common IA: identical for KR & US ----
       officerCols:[{label:'성명 / 역할',align:'left'},{label:'직위',align:'left'},{label:'구분',align:'left'},{label:'담당 / 주요경력',align:'left'},{label:'주식보유',align:'right'},{label:'재직 / 선임',align:'right'},{label:'위원회 / 비고',align:'right'}],
@@ -3192,33 +3507,71 @@ Executive Officers / Director Nominees / Director Compensation / Compensation of
       comp47Title:'임원 보수 요약',
       comp48Title:'이사 보수',
       comp49Title:'개인별 보수 상세',
-      comp410Title:'주식보상 현황',
-      ratioTitle:'보상 비율·성과 지표',
+      comp410Title:'인센티브 및 주식보상',
+      ratioTitle:'보상-성과 지표',
       ratioEmpty: !d.ratioAvailable,
       pvpAvailable: pvp.length>0,
       ratioCardEmpty: !d.ratioAvailable,
       pvpCardEmpty: !(pvp.length>0),
-      ratioNullTitle: d.market==='US' ? '현재 확인할 수 없습니다' : '해당사항 없음',
-      ratioNullText: d.market==='US' ? '현재 연결된 원문 데이터 범위에서는 CEO 보수비율을 확인할 수 없습니다.' : 'KR DART 사업보고서에는 SEC CEO Pay Ratio 공시 구조가 적용되지 않습니다.',
-      pvpNullTitle: d.market==='US' ? '현재 확인할 수 없습니다' : '해당사항 없음',
-      pvpNullText: d.market==='US' ? '현재 연결된 원문 데이터 범위에서는 보상-성과 비교를 확인할 수 없습니다.' : 'KR DART 사업보고서에는 SEC Pay-vs-Performance 공시 구조가 적용되지 않습니다.',
+      ratioNullTitle: '', ratioNullText: '현재 해당 항목을 확인할 수 없습니다.',
+      pvpNullTitle: '', pvpNullText: '현재 해당 항목을 확인할 수 없습니다.',
       ratioOrPvp: !!d.ratioAvailable || pvp.length>0,
       ratioBothEmpty: !d.ratioAvailable && pvp.length===0,
-      ratioBothEmptyTitle: '해당사항 없음',
-      ratioBothEmptyText: '해당 문서에서는 CEO 보수비율 및 보상-성과 비교가 적용되지 않습니다.',
+      ratioBothEmptyTitle: '',
+      ratioBothEmptyText: '해당 문서에서는 제공되지 않습니다. (공시 기준 차이)',
       pvpEmptyInRatio: !!d.ratioAvailable && pvp.length===0,
       pvpEmptyText: d.pvpEmptyText || '현재 연결된 원문 데이터 범위에서는 보상-성과 비교를 확인할 수 없습니다.',
       pvpStatus: d.pvpStatus || (pvp.length>0 ? 'available' : 'not_in_filing'),
       pvpStatusLabel: 'pvpStatus: ' + (d.pvpStatus || (pvp.length>0 ? 'available' : 'not_in_filing')),
+      // ===== 1차 구조보완 =====
+      // (A) CEO–직원 보수배율 (Pay Ratio) 섹션
+      payRatioCeoTotal: d.payRatioCeoTotal || '—',
+      payRatioMedianDisp: d.payRatioMedianDisp || '—',
+      ratioSctCaveat: '※ Summary Compensation Table 총보수와 Pay Ratio 산정 CEO 보수는 각주·반올림 기준으로 다를 수 있어 동일 값으로 취급하지 않습니다.',
+      ratioBarWidth: ratioGauge ? (ratioGauge.pct).toFixed(0)+'%' : '0%',
+      ratioNullTitle2: '',
+      ratioNullText2: d.market==='US'
+        ? '현재 해당 항목을 확인할 수 없습니다.'
+        : '해당 문서에서는 제공되지 않습니다. (공시 기준 차이)',
+      // (B) 보상-성과 지표 (SCT vs CAP) 섹션
+      pvpBasisLabel: d.pvpVerified
+        ? '표시 기준: 명목 보수(SCT) · 실지급 보수(CAP) · 주주수익(TSR) · 순이익 (원문 대조 완료)'
+        : '현재 표시 기준: 명목 보수(SCT) vs 실지급 보수(CAP) · 주주수익(TSR)·순이익은 미연결',
+      pvpHasPerf: pvp.length>0 && !!d.pvpVerified && pvp.some(p=>p.tsr!=='—'),
+      pvpNoPerf: !(pvp.length>0 && !!d.pvpVerified && pvp.some(p=>p.tsr!=='—')),
+      pvpNullTitle2: '',
+      pvpNullText2: d.market==='US'
+        ? '현재 해당 항목을 확인할 수 없습니다.'
+        : '해당 문서에서는 제공되지 않습니다. (공시 기준 차이)',
+      // (직원) US Median Employee Pay 블록
+      usEmployeeShow: d.market==='US',
+      usEmpMedianDisp: (d.market==='US' && d.payRatioMedianN!=null) ? d.payRatioMedianDisp : '—',
+      usEmpCeoTotalDisp: (d.market==='US') ? (d.payRatioCeoTotal||'—') : '—',
+      usEmpRatioDisp: (d.market==='US' && d.ratioAvailable) ? d.payRatioDisp : '—',
+      usEmployeeNote: (d.market==='US' && d.payRatioMedianN!=null)
+        ? '직원 중위보수(Median Employee Pay) 기준으로 표시합니다. 총직원수는 현재 해당 항목을 확인할 수 없습니다.'
+        : '직원 중위보수(Median)는 현재 해당 항목을 확인할 수 없습니다.',
+      employeesEmptyKR: !!d.employeesEmpty && d.market==='KR',
+      empSummaryEmployment: empSummary ? empSummary.employmentLine : '',
+      empSummaryMetric: empSummary ? empSummary.metricLine : '',
+      // (이사 보수) KR 한도/집행 vs US 실지급 분기
+      dirHasAnyKR: !dirBothEmpty && d.market==='KR',
+      dirBothEmptyKR: dirBothEmpty && d.market==='KR',
+      dirUSShow: d.market==='US',
+      dirUSPaidRows: (d.dirUSPaid && d.dirUSPaid.rows) || [],
+      dirUSHasPaid: !!(d.dirUSPaid && d.dirUSPaid.rows && d.dirUSPaid.rows.length),
+      dirUSEmptyShow: !(d.dirUSPaid && d.dirUSPaid.rows && d.dirUSPaid.rows.length),
+      dirUSEmptyTitle: '',
+      dirUSEmptyText: d.dirUSEmptyText || '현재 해당 항목을 확인할 수 없습니다.',
       dirHasAny: !dirBothEmpty, dirBothEmpty,
       dirPaidEmpty: dirPaidEmptyFlag,
-      dirPaidEmptyTitle: dirIsUS ? '현재 확인할 수 없습니다' : '해당사항 없음',
-      dirPaidEmptyText: dirIsUS ? '현재 연결된 SEC 원문 데이터에서는 실제 지급액을 확인할 수 없습니다.' : '해당 원문 문서에서는 실제 지급액이 별도로 제공되지 않았습니다.',
-      dirBothEmptyTitle: dirIsUS ? '현재 확인할 수 없습니다' : '해당사항 없음',
-      dirBothEmptyText: dirIsUS ? '현재 연결된 SEC 원문 데이터에서는 이사 보수 한도 및 실제 지급액을 확인할 수 없습니다.' : '해당 원문 문서에서는 이사 보수 한도 및 실제 지급액이 별도 항목으로 제공되지 않았습니다.',
+      dirPaidEmptyTitle: '',
+      dirPaidEmptyText: dirIsUS ? '현재 해당 항목을 확인할 수 없습니다.' : '해당 문서에서는 제공되지 않습니다. (공시 기준 차이)',
+      dirBothEmptyTitle: '',
+      dirBothEmptyText: dirIsUS ? '현재 해당 항목을 확인할 수 없습니다.' : '해당 문서에서는 제공되지 않습니다. (공시 기준 차이)',
       dirLimitAvailable: !!(d.dirLimit && d.dirLimit.available),
       dirLimitEmpty: !(d.dirLimit && d.dirLimit.available),
-      dirLimitEmptyText: (d.dirLimit && d.dirLimit.emptyText) || '해당 문서에서는 보수 한도가 제공되지 않습니다.',
+      dirLimitEmptyText: (d.dirLimit && d.dirLimit.emptyText) || '해당 문서에서는 제공되지 않습니다. (공시 기준 차이)',
       dirLimitRows: (d.dirLimit && d.dirLimit.rows) || [],
       dirLimitNote: (d.dirLimit && d.dirLimit.note) || '',
       dirPaidRows: ((d.dirPaid && d.dirPaid.rows) || []).map(p=>({...p, outsideBadge: p.outsideLimit ? 'inline-flex;align-items:center;font-size:9.5px;font-weight:600;padding:1.5px 6px;border-radius:5px;color:#FBBF24;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.32);margin-left:6px;' : 'display:none;'})),
